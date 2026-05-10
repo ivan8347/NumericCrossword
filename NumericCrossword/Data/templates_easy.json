@@ -1,0 +1,492 @@
+﻿{
+  "templates": [
+    {
+      "name": "cross_center",
+      "slots": [
+        {
+          "row": 7,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 10,
+          "horizontal": true
+        },
+        {
+          "row": 8,
+          "col": 9,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "cross_up",
+      "slots": [
+        {
+          "row": 5,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 3,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 5,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 10,
+          "horizontal": true
+        },
+        {
+          "row": 6,
+          "col": 9,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "cross_down",
+      "slots": [
+        {
+          "row": 9,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 9,
+          "col": 10,
+          "horizontal": true
+        },
+        {
+          "row": 10,
+          "col": 9,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "cross_left",
+      "slots": [
+        {
+          "row": 7,
+          "col": 5,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 7,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 2,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 8,
+          "horizontal": true
+        },
+        {
+          "row": 8,
+          "col": 7,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "cross_right",
+      "slots": [
+        {
+          "row": 7,
+          "col": 9,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 11,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 6,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 12,
+          "horizontal": true
+        },
+        {
+          "row": 8,
+          "col": 11,
+          "horizontal": false
+        }
+      ]
+    },
+
+    {
+      "name": "t_shape_up",
+      "slots": [
+        {
+          "row": 5,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 3,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 5,
+          "col": 4,
+          "horizontal": true
+        }
+      ]
+    },
+    {
+      "name": "t_shape_down",
+      "slots": [
+        {
+          "row": 9,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "horizontal": true
+        }
+      ]
+    },
+    {
+      "name": "t_shape_left",
+      "slots": [
+        {
+          "row": 7,
+          "col": 5,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 7,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 2,
+          "horizontal": true
+        }
+      ]
+    },
+    {
+      "name": "t_shape_right",
+      "slots": [
+        {
+          "row": 7,
+          "col": 9,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 11,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 12,
+          "horizontal": true
+        }
+      ]
+    },
+
+    {
+      "name": "double_cross_small",
+      "slots": [
+        {
+          "row": 6,
+          "col": 6,
+          "horizontal": true
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "horizontal": false
+        },
+        {
+          "row": 6,
+          "col": 3,
+          "horizontal": true
+        },
+        {
+          "row": 6,
+          "col": 9,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 8,
+          "horizontal": false
+        },
+
+        {
+          "row": 9,
+          "col": 12,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 14,
+          "horizontal": false
+        },
+        {
+          "row": 9,
+          "col": 9,
+          "horizontal": true
+        },
+        {
+          "row": 9,
+          "col": 15,
+          "horizontal": true
+        },
+        {
+          "row": 10,
+          "col": 14,
+          "horizontal": false
+        }
+      ]
+    },
+
+    {
+      "name": "horizontal_chain",
+      "slots": [
+        {
+          "row": 5,
+          "col": 2,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 7,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 12,
+          "horizontal": true
+        }
+      ]
+    },
+    {
+      "name": "vertical_chain",
+      "slots": [
+        {
+          "row": 2,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 6,
+          "col": 9,
+          "horizontal": false
+        },
+        {
+          "row": 10,
+          "col": 9,
+          "horizontal": false
+        }
+      ]
+    },
+
+    {
+      "name": "zigzag_1",
+      "slots": [
+        {
+          "row": 4,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "horizontal": false
+        },
+        {
+          "row": 7,
+          "col": 8,
+          "horizontal": true
+        }
+      ]
+    },
+    {
+      "name": "zigzag_2",
+      "slots": [
+        {
+          "row": 9,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 9,
+          "col": 8,
+          "horizontal": false
+        },
+        {
+          "row": 6,
+          "col": 8,
+          "horizontal": true
+        }
+      ]
+    },
+
+    {
+      "name": "corner_L1",
+      "slots": [
+        {
+          "row": 4,
+          "col": 10,
+          "horizontal": true
+        },
+        {
+          "row": 4,
+          "col": 14,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "corner_L2",
+      "slots": [
+        {
+          "row": 10,
+          "col": 4,
+          "horizontal": true
+        },
+        {
+          "row": 6,
+          "col": 4,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "corner_L3",
+      "slots": [
+        {
+          "row": 10,
+          "col": 12,
+          "horizontal": true
+        },
+        {
+          "row": 6,
+          "col": 14,
+          "horizontal": false
+        }
+      ]
+    },
+    {
+      "name": "corner_L4",
+      "slots": [
+        {
+          "row": 4,
+          "col": 2,
+          "horizontal": true
+        },
+        {
+          "row": 4,
+          "col": 6,
+          "horizontal": false
+        }
+      ]
+    },
+
+    {
+      "name": "two_crosses_far",
+      "slots": [
+        {
+          "row": 5,
+          "col": 5,
+          "horizontal": true
+        },
+        {
+          "row": 3,
+          "col": 7,
+          "horizontal": false
+        },
+        {
+          "row": 5,
+          "col": 2,
+          "horizontal": true
+        },
+        {
+          "row": 5,
+          "col": 8,
+          "horizontal": true
+        },
+        {
+          "row": 6,
+          "col": 7,
+          "horizontal": false
+        },
+
+        {
+          "row": 9,
+          "col": 13,
+          "horizontal": true
+        },
+        {
+          "row": 7,
+          "col": 15,
+          "horizontal": false
+        },
+        {
+          "row": 9,
+          "col": 10,
+          "horizontal": true
+        },
+        {
+          "row": 9,
+          "col": 16,
+          "horizontal": true
+        },
+        {
+          "row": 10,
+          "col": 15,
+          "horizontal": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using NumericCrossword.Models;
+using Newtonsoft.Json;
+
+
 
 namespace NumericCrossword
 {
@@ -286,26 +291,36 @@ namespace NumericCrossword
         {
             templatesEasy.Clear();
 
-            var t = new CrosswordTemplate();
+            string path = "Data/templates_easy.json";
 
-            // Центральная горизонтальная формула
-            t.Slots.Add(new FormulaSlot { Row = 5, Col = 4, Horizontal = true });
+            if (!File.Exists(path))
+            {
+                MessageBox.Show("Файл шаблонов не найден: " + path);
+                return;
+            }
 
-            // Вертикальная формула пересекает по B (индекс 2)
-            t.Slots.Add(new FormulaSlot { Row = 3, Col = 6, Horizontal = false });
+            string json = File.ReadAllText(path);
 
-            // Левая горизонтальная формула пересекает по A (индекс 0)
-            t.Slots.Add(new FormulaSlot { Row = 5, Col = 2, Horizontal = true });
+            var data = Newtonsoft.Json.JsonConvert.DeserializeObject<TemplateFile>(json);
 
-            // Правая горизонтальная формула пересекает по C (индекс 4)
-            t.Slots.Add(new FormulaSlot { Row = 5, Col = 8, Horizontal = true });
+            foreach (var t in data.templates)
+            {
+                CrosswordTemplate ct = new CrosswordTemplate();
 
-            // Нижняя вертикальная формула пересекает по C (индекс 4)
-            // ❗ СДВИГАЕМ НА 1 ВНИЗ, ЧТОБЫ НЕ ПЕРЕКРЫВАТЬСЯ С ВЕРХНЕЙ
-            t.Slots.Add(new FormulaSlot { Row = 6, Col = 6, Horizontal = false });
+                foreach (var s in t.slots)
+                {
+                    ct.Slots.Add(new FormulaSlot
+                    {
+                        Row = s.Row,
+                        Col = s.Col,
+                        Horizontal = s.Horizontal
+                    });
+                }
 
-            templatesEasy.Add(t);
+                templatesEasy.Add(ct);
+            }
         }
+
 
 
 
