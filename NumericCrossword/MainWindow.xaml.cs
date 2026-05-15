@@ -127,10 +127,12 @@ namespace NumericCrossword
         private void Cell_Click(object sender, MouseButtonEventArgs e)
         {
             Label cell = sender as Label;
-            // работаем только с клетками формул
-            if (cell.BorderBrush != Brushes.LightGray && cell.BorderBrush != Brushes.Red)
+
+            // работать только со скрытыми клетками
+            if ((string)cell.Tag != "hidden")
                 return;
-            // Вариант 2: плитка → клик по ячейке
+
+            // если выбрана плитка — вставляем
             if (selectedTileValue != null)
             {
                 InsertValueIntoCell(cell, selectedTileValue);
@@ -141,23 +143,25 @@ namespace NumericCrossword
                 return;
             }
 
-            // Выделение ячейки
-            if (cell.Tag as string == "selected")
+            // переключение выделения
+            if (cell.BorderBrush == Brushes.Red)
             {
                 cell.BorderBrush = Brushes.LightGray;
-                cell.Tag = "normal";
+                cell.BorderThickness = new Thickness(1);
             }
             else
             {
                 cell.BorderBrush = Brushes.Red;
-                cell.Tag = "selected";
+                cell.BorderThickness = new Thickness(3);
             }
         }
+
+
+
         private void InsertValueIntoCell(Label cell, string value)
         {
-            var color = (cell.Background as SolidColorBrush)?.Color;
-
-            if (color != Colors.LightYellow && color != Colors.LightBlue)
+            // сюда уже пришли только hidden, но на всякий случай:
+            if ((string)cell.Tag != "hidden")
                 return;
 
             int row = Grid.GetRow(cell);
@@ -165,14 +169,8 @@ namespace NumericCrossword
 
             string oldValue = cell.Content?.ToString() ?? "";
 
-            // запрещаем вставку в операторы
-            if (oldValue == "+" || oldValue == "-" || oldValue == "*" || oldValue == "/" || oldValue == "=")
-                return;
-
-            // плитка удаляется ТОЛЬКО если ячейка была пустая
             bool tileWasRemoved = string.IsNullOrEmpty(oldValue);
 
-            // если ячейка была заполнена — вернуть старую плитку
             if (!tileWasRemoved && int.TryParse(oldValue, out _))
                 ReturnTile(oldValue);
 
@@ -180,12 +178,12 @@ namespace NumericCrossword
             cellUndoStack.Push((row, col, oldValue, value, tileWasRemoved));
 
             cell.Content = value;
+            cell.BorderBrush = Brushes.LightGreen;
+            cell.BorderThickness = new Thickness(5);
 
-            // Проверка решения
+
             if (IsCrosswordSolved())
                 ShowWinMessage();
-        
-
         }
 
 
@@ -233,34 +231,15 @@ namespace NumericCrossword
             string value = (string)e.Data.GetData(DataFormats.StringFormat);
             Label cell = sender as Label;
 
-            var color = (cell.Background as SolidColorBrush)?.Color;
-
-            if (color != Colors.LightYellow && color != Colors.LightBlue)
+            // только скрытые клетки
+            if ((string)cell.Tag != "hidden")
                 return;
 
-            int row = Grid.GetRow(cell);
-            int col = Grid.GetColumn(cell);
-
-            string oldValue = cell.Content?.ToString() ?? "";
-
-            if (oldValue == "+" || oldValue == "-" || oldValue == "*" || oldValue == "/" || oldValue == "=")
-                return;
-
-            bool tileWasRemoved = string.IsNullOrEmpty(oldValue);
-
-            if (!tileWasRemoved && int.TryParse(oldValue, out _))
-                ReturnTile(oldValue);
-
-            undoStack.Push((row, col, oldValue, value, tileWasRemoved));
-            cellUndoStack.Push((row, col, oldValue, value, tileWasRemoved));
-
-            cell.Content = value;
-
+            InsertValueIntoCell(cell, value);
             RemoveTile(value);
-            // Проверка решения
+
             if (IsCrosswordSolved())
                 ShowWinMessage();
-
         }
 
 
@@ -287,7 +266,7 @@ namespace NumericCrossword
         // -----------------------------
         private void BtnUndo_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Ищем выделенную ячейку
+            // 1. Ищем выделенную ячейку по красной рамке
             int selRow = -1;
             int selCol = -1;
 
@@ -295,7 +274,7 @@ namespace NumericCrossword
             {
                 for (int c = 0; c < Cols; c++)
                 {
-                    if (cells[r, c].Tag as string == "selected")
+                    if (cells[r, c].BorderBrush == Brushes.Red)
                     {
                         selRow = r;
                         selCol = c;
@@ -334,16 +313,53 @@ namespace NumericCrossword
 
                 if (target.row != -1)
                 {
+                    // восстановить значение
                     cells[selRow, selCol].Content = target.oldValue;
 
+                    // вернуть плитку, если она была удалена
                     if (target.tileWasRemoved)
                         ReturnTile(target.newValue);
 
+                    // снять выделение
+                    cells[selRow, selCol].BorderBrush = Brushes.LightGray;
+                    cells[selRow, selCol].BorderThickness = new Thickness(1);
+                   // cells[selRow, selCol].Background = Brushes.LightYellow;
+
+                    // очистить ВСЕ записи об этой ячейке из cellUndoStack
+                    Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp2 =
+                        new Stack<(int, int, string, string, bool)>();
+
+                    while (cellUndoStack.Count > 0)
+                    {
+                        var m = cellUndoStack.Pop();
+                        if (!(m.row == selRow && m.col == selCol))
+                            temp2.Push(m);
+                    }
+
+                    while (temp2.Count > 0)
+                        cellUndoStack.Push(temp2.Pop());
+
+                    // ❗ ОБЯЗАТЕЛЬНО: очистить ВСЕ записи об этой ячейке из undoStack
+                    Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp3 =
+                        new Stack<(int, int, string, string, bool)>();
+
+                    while (undoStack.Count > 0)
+                    {
+                        var m = undoStack.Pop();
+                        if (!(m.row == selRow && m.col == selCol))
+                            temp3.Push(m);
+                    }
+
+                    while (temp3.Count > 0)
+                        undoStack.Push(temp3.Pop());
+
                     return;
                 }
+
+
             }
 
-            // 3. Undo плиток
+            // 3. Обычный Undo плиток
             if (undoStack.Count == 0)
                 return;
 
@@ -355,6 +371,13 @@ namespace NumericCrossword
 
             if (tileMove.tileWasRemoved)
                 ReturnTile(tileMove.newValue);
+
+            cell.BorderBrush = Brushes.LightGray;
+            cell.BorderThickness = new Thickness(1);
+
+            /*cell.Background = string.IsNullOrEmpty(tileMove.oldValue)
+                ? Brushes.LightYellow
+                : Brushes.LightGreen;*/
         }
 
         private void ReturnTile(string value)
@@ -616,7 +639,7 @@ namespace NumericCrossword
         // -----------------------------
         private void DrawFormulas(List<Formula> formulas)
         {
-            // 1. Сначала очищаем ВСЕ клетки
+            // 1. Очищаем сетку
             for (int r = 0; r < Rows; r++)
             {
                 for (int c = 0; c < Cols; c++)
@@ -624,10 +647,11 @@ namespace NumericCrossword
                     cells[r, c].Background = Brushes.White;
                     cells[r, c].Tag = null;
                     cells[r, c].Content = "";
+                    cells[r, c].BorderBrush = Brushes.LightGray;
                 }
             }
 
-            // 2. Теперь рисуем формулы
+            // 2. Рисуем формулы
             foreach (var f in formulas)
             {
                 string[] symbols = {
@@ -645,18 +669,36 @@ namespace NumericCrossword
 
                     var cell = cells[r, c];
 
-                    // клетки формулы — жёлтые
                     cell.Background = Brushes.LightYellow;
-                    cell.Tag = "normal";
 
-                    // скрытые значения
-                    if (i == 0 && f.HideA) cell.Content = "";
-                    else if (i == 2 && f.HideB) cell.Content = "";
-                    else if (i == 4 && f.HideC) cell.Content = "";
-                    else cell.Content = symbols[i];
+                    // --- ТИП КЛЕТКИ ---
+                    if (i == 1 || i == 3)          // оператор или "="
+                    {
+                        cell.Tag = "op";
+                        cell.Content = symbols[i];
+                    }
+                    else                            // число
+                    {
+                        bool hidden =
+                            (i == 0 && f.HideA) ||
+                            (i == 2 && f.HideB) ||
+                            (i == 4 && f.HideC);
+
+                        if (hidden)
+                        {
+                            cell.Tag = "hidden";    // сюда можно ставить плитки
+                            cell.Content = "";
+                        }
+                        else
+                        {
+                            cell.Tag = "fixed";     // менять нельзя
+                            cell.Content = symbols[i];
+                        }
+                    }
                 }
             }
         }
+
 
         // -----------------------------
         //  ПЛИТКИ
@@ -766,57 +808,17 @@ namespace NumericCrossword
             DrawFormulas(formulas);
             CreateTilesFromFormulas(formulas);
         }
-         //----------------------------
-         // КОНЕЦ ИГРЫ
-         //----------------------------
+        //----------------------------
+        // КОНЕЦ ИГРЫ
+        //----------------------------
+
         private void ShowWinMessage()
         {
-            Window msg = new Window
-            {
-                Width = 350,
-                Height = 200,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = this,
-                ResizeMode = ResizeMode.NoResize,
-                WindowStyle = WindowStyle.None,
-                Background = new SolidColorBrush(Color.FromRgb(255, 240, 0)), // ярко-жёлтый
-                AllowsTransparency = true,
-                Opacity = 0.95,
-                Topmost = true
-            };
-
-            Grid g = new Grid();
-            msg.Content = g;
-
-            TextBlock text = new TextBlock
-            {
-                Text = " УРААААА!\nКРОССВОРД РЕШЁН!",
-                FontSize = 32,
-                FontWeight = FontWeights.Bold,
-                Foreground = Brushes.Red,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                TextAlignment = TextAlignment.Center
-            };
-
-            Button ok = new Button
-            {
-                Content = "OK",
-                Width = 80,
-                Height = 40,
-                FontSize = 20,
-                Margin = new Thickness(0, 20, 0, 0),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Bottom
-            };
-
-            ok.Click += (s, e) => msg.Close();
-
-            g.Children.Add(text);
-            g.Children.Add(ok);
-
+            WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
+            msg.Owner = this;
             msg.ShowDialog();
         }
+
         private bool IsCrosswordSolved()
         {
             foreach (var f in formulas)
