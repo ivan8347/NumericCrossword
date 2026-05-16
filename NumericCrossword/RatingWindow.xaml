@@ -1,0 +1,42 @@
+﻿<Window x:Class="NumericCrossword.RatingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Width="420" Height="350"
+        WindowStartupLocation="CenterOwner">
+
+    <Border CornerRadius="20"
+            Background="#FF1E1E1E"
+            BorderBrush="#55FFFFFF"
+            BorderThickness="2"
+            Padding="20">
+
+        <StackPanel>
+
+            <TextBlock Text="Рейтинг"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0 0 0 20"/>
+
+            <ListBox x:Name="ListScores"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Foreground="White"
+                     FontSize="20"/>
+
+            <Button Content="OK"
+                    Width="120" Height="40"
+                    HorizontalAlignment="Center"
+                    Margin="0 20 0 0"
+                    Click="Ok_Click"
+                    Background="#AA000000"
+                    Foreground="White"
+                    BorderThickness="0"/>
+        </StackPanel>
+
+    </Border>
+</Window>

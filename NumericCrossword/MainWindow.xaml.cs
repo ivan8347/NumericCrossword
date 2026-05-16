@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using NumericCrossword.Models;
+using NumericCrossword.Core;
 
 
 
@@ -51,9 +52,13 @@ namespace NumericCrossword
 
         private int secondsPassed = 0;
         private DispatcherTimer timer;
+        private TimeSpan timerValue = TimeSpan.Zero;
+
 
         private string selectedTileValue = null;
         private Label selectedTileLabel = null;
+        private string currentDifficulty = "Лёгкий";
+
 
         private Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> cellUndoStack
             = new Stack<(int, int, string, string, bool)>();
@@ -415,11 +420,18 @@ namespace NumericCrossword
             timer.Tick += Timer_Tick;
         }
 
+        /*  private void Timer_Tick(object sender, EventArgs e)
+          {
+              secondsPassed++;
+              TimerText.Text = TimeSpan.FromSeconds(secondsPassed).ToString(@"mm\:ss");
+          }*/
         private void Timer_Tick(object sender, EventArgs e)
         {
-            secondsPassed++;
-            TimerText.Text = TimeSpan.FromSeconds(secondsPassed).ToString(@"mm\:ss");
+
+            timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
+            TimerText.Text = timerValue.ToString(@"mm\:ss");
         }
+
 
         // -----------------------------
         //  ГЕНЕРАЦИЯ ОДНОЙ ФОРМУЛЫ
@@ -614,7 +626,7 @@ namespace NumericCrossword
             int difficulty = DifficultyBox.SelectedIndex;
 
             double hideChance = difficulty == 0 ? 0.05 :
-                                difficulty == 1 ? 0.65 : 0.80;
+                                difficulty == 1 ? 0.05 : 0.80;
 
             foreach (var f in formulas)
             {
@@ -814,6 +826,15 @@ namespace NumericCrossword
 
         private void ShowWinMessage()
         {
+           // 1.Сохраняем рекорд
+            ScoreStorage.AddRecord(new ScoreRecord
+            {
+                Difficulty = currentDifficulty,
+                Time = timerValue,
+                Date = DateTime.Now
+            });
+
+
             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
             msg.Owner = this;
             msg.ShowDialog();
@@ -872,6 +893,21 @@ namespace NumericCrossword
             if (int.TryParse(s, out int v))
                 return v;
             return -1;
+        }
+
+        private void BtnRating_Click(object sender, RoutedEventArgs e)
+        {
+            RatingWindow win = new RatingWindow();
+            win.Owner = this;
+            win.ShowDialog();
+        }
+
+        private void DifficultyBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (DifficultyBox.SelectedItem is ComboBoxItem item)
+            {
+                currentDifficulty = item.Content.ToString();
+            }
         }
 
     }

@@ -46,8 +46,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\FormulaSlot.cs" />
+    <Compile Include="Models\PlayerProfile.cs" />
+    <Compile Include="Models\ScoreRecord.cs" />
+    <Compile Include="Models\ScoreStorage.cs" />
     <Compile Include="Models\TemplateFile.cs" />
     <Compile Include="Models\TemplateJson.cs" />
+    <Compile Include="RatingWindow.xaml.cs">
+      <DependentUpon>RatingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WinMessage.xaml.cs">
       <DependentUpon>WinMessage.xaml</DependentUpon>
     </Compile>
@@ -61,12 +67,17 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="RatingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WinMessage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\scores.json" />
     <None Include="Data\templates_easy.json" />
     <None Include="packages.config" />
   </ItemGroup>

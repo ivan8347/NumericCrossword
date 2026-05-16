@@ -26,7 +26,14 @@
                     Margin="5"
                     Click="BtnUndo_Click"/>
             
+            <Button x:Name="BtnRating"
+                    Content="Рейтинг"
+                    Width="120" Height="40"
+                    Margin="5"
+                    Click="BtnRating_Click"/>
+            
             <ComboBox x:Name="DifficultyBox"
+                      SelectionChanged="DifficultyBox_SelectionChanged"
                  Width="120" Height="40"
                  Margin="5"
                  HorizontalContentAlignment="Center"
@@ -35,6 +42,7 @@
                 <ComboBoxItem Content="Средний"/>
                 <ComboBoxItem Content="Сложный"/>
             </ComboBox>
+
 
 
 
