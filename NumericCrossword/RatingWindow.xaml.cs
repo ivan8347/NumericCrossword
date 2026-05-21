@@ -23,22 +23,16 @@ namespace NumericCrossword
             int place = 1;
             foreach (var s in ordered)
             {
-                string medal =  place == 1 ? "🥇" :
-                                place == 2 ? "🥈" :
-                                place == 3 ? "🥉" : $"{place}.";
+                //string medal =  place == 1 ? "🥇" :
+                //                place == 2 ? "🥈" :
+                //                place == 3 ? "🥉" : $"{place}.";
 
                 ListScores.Items.Add(
-                    $"{medal}  {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
+                    $"{place}  - {s.Name} — {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
                 );
 
                 place++;
             }
-
-
-            //if (ordered.Count == 0)
-            //{
-            //    ListScores.Items.Add("Пока нет рекордов. Реши кроссворд первым!");
-            //}
         }
 
         private void Ok_Click(object sender, RoutedEventArgs e)

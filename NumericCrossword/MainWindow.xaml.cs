@@ -47,10 +47,10 @@ namespace NumericCrossword
     {
         private const int Rows = 15;
         private const int Cols = 20;
+        private int score = 0;
 
         private Label[,] cells = new Label[Rows, Cols];
 
-        private int secondsPassed = 0;
         private DispatcherTimer timer;
         private TimeSpan timerValue = TimeSpan.Zero;
 
@@ -58,6 +58,8 @@ namespace NumericCrossword
         private string selectedTileValue = null;
         private Label selectedTileLabel = null;
         private string currentDifficulty = "Лёгкий";
+        //private bool isPaused = false;
+
 
 
         private Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> cellUndoStack
@@ -72,7 +74,7 @@ namespace NumericCrossword
 
         private List<Formula> formulas = new List<Formula>();
 
-
+        public static PlayerProfile CurrentPlayer;
 
         public MainWindow()
         {
@@ -81,6 +83,14 @@ namespace NumericCrossword
             InitTimer();
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
+
+            PlayerSelectWindow ps = new PlayerSelectWindow();
+
+            if (ps.ShowDialog() == true)
+                CurrentPlayer = ps.SelectedPlayer;
+            else
+                CurrentPlayer = new PlayerProfile { Name = "Игрок" };
+            BtnSelectPlayer.Content = CurrentPlayer.Name;
         }
 
         // -----------------------------
@@ -161,11 +171,8 @@ namespace NumericCrossword
             }
         }
 
-
-
         private void InsertValueIntoCell(Label cell, string value)
         {
-            // сюда уже пришли только hidden, но на всякий случай:
             if ((string)cell.Tag != "hidden")
                 return;
 
@@ -183,14 +190,28 @@ namespace NumericCrossword
             cellUndoStack.Push((row, col, oldValue, value, tileWasRemoved));
 
             cell.Content = value;
+
+            // Подсветка правильной клетки
             cell.BorderBrush = Brushes.LightGreen;
             cell.BorderThickness = new Thickness(5);
 
+            // 🎯 НАЧИСЛЕНИЕ ОЧКОВ
+            int add = 0;
+
+            switch (currentDifficulty)
+            {
+                case "Лёгкий": add = 1; break;
+                case "Средний": add = 5; break;
+                case "Сложный": add = 10; break;
+            }
+
+            score += add;
+            ScoreText.Text = score.ToString();
+            // -------------------------------
 
             if (IsCrosswordSolved())
                 ShowWinMessage();
         }
-
 
 
         // -----------------------------
@@ -246,8 +267,6 @@ namespace NumericCrossword
             if (IsCrosswordSolved())
                 ShowWinMessage();
         }
-
-
 
         private void RemoveTile(string value)
         {
@@ -419,23 +438,12 @@ namespace NumericCrossword
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += Timer_Tick;
         }
-
-        /*  private void Timer_Tick(object sender, EventArgs e)
-          {
-              secondsPassed++;
-              TimerText.Text = TimeSpan.FromSeconds(secondsPassed).ToString(@"mm\:ss");
-          }*/
         private void Timer_Tick(object sender, EventArgs e)
         {
-
             timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
             TimerText.Text = timerValue.ToString(@"mm\:ss");
         }
-
-
-        // -----------------------------
         //  ГЕНЕРАЦИЯ ОДНОЙ ФОРМУЛЫ
-        // -----------------------------
         private Formula GenerateRandomFormula()
         {
             char[] ops = { '+', '-', '*', '/' };
@@ -484,9 +492,7 @@ namespace NumericCrossword
         }
 
         // ===== ЧАСТЬ 2 =====
-        // -----------------------------
         //  ШАБЛОНЫ
-        // -----------------------------
         private void InitTemplates()
         {
             templatesEasy.Clear();
@@ -521,9 +527,7 @@ namespace NumericCrossword
             }
         }
 
-        // -----------------------------
         //  ЗАПИСЬ ФОРМУЛЫ В СЕТКУ
-        // -----------------------------
         private void PlaceFormulaToGrid(Formula f, string[,] grid)
         {
             string[] symbols = {
@@ -808,37 +812,77 @@ namespace NumericCrossword
         private void BtnNewGame_Click(object sender, RoutedEventArgs e)
         {
             undoStack.Clear();
-            secondsPassed = 0;
-            TimerText.Text = "00:00";
             timer.Stop();
+            timerValue = TimeSpan.Zero;   // сброс времени
+            TimerText.Text = "00:00";
             timer.Start();
+            score = 0;
+            ScoreText.Text = "0";
 
             CreateGrid();
-
             formulas = GenerateCrossword();
             ApplyDifficulty(formulas);
             DrawFormulas(formulas);
             CreateTilesFromFormulas(formulas);
         }
-        //----------------------------
+
+        /*private void BtnPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isPaused)
+            {
+                timer.Stop();
+                BtnPause.Content = "Продолжить";
+                isPaused = true;
+            }
+            else
+            {
+                timer.Start();
+                BtnPause.Content = "Пауза";
+                isPaused = false;
+            }
+        }*/
+
         // КОНЕЦ ИГРЫ
-        //----------------------------
 
         private void ShowWinMessage()
         {
-           // 1.Сохраняем рекорд
+            timer.Stop();
+
+            // 1. Сохраняем рекорд
             ScoreStorage.AddRecord(new ScoreRecord
             {
+                Name = MainWindow.CurrentPlayer.Name,
                 Difficulty = currentDifficulty,
                 Time = timerValue,
+                Score = score,
                 Date = DateTime.Now
             });
 
+            // 2. Загружаем всех игроков
+            var players = PlayerStorage.Load();
 
+            // 3. Находим текущего игрока
+            var p = players.FirstOrDefault(x => x.Name == MainWindow.CurrentPlayer.Name);
+
+            if (p != null)
+            {
+                // 4. Добавляем очки в профиль
+                p.TotalScore += score;
+            }
+
+            // 5. Сохраняем обновлённый список игроков
+            PlayerStorage.Save(players);
+
+            // 6. Показываем окно победы
             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
             msg.Owner = this;
             msg.ShowDialog();
+
+            // 7. Показываем рейтинг
+            RatingWindow rw = new RatingWindow();
+            rw.ShowDialog();
         }
+
 
         private bool IsCrosswordSolved()
         {
@@ -909,6 +953,15 @@ namespace NumericCrossword
                 currentDifficulty = item.Content.ToString();
             }
         }
+        private void BtnSelectPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            PlayerSelectWindow ps = new PlayerSelectWindow();
 
+            if (ps.ShowDialog() == true)
+            {
+                CurrentPlayer = ps.SelectedPlayer;
+                BtnSelectPlayer.Content = CurrentPlayer.Name;
+            }
+        }
     }
 }

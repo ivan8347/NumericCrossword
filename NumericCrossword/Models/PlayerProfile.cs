@@ -9,5 +9,7 @@ namespace NumericCrossword.Models
     public class PlayerProfile
     {
         public string Name { get; set; }
+        public string Avatar { get; set; }
+        public int TotalScore { get; set; } = 0;
     }
 }

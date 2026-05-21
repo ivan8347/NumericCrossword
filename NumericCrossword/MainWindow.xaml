@@ -20,6 +20,13 @@
                     Margin="5"
                     Click="BtnNewGame_Click"/>
 
+            <!--<Button x:Name="BtnPause"
+                     Content="Пауза"
+                     Width="80"
+                     Margin="5"
+                     Click="BtnPause_Click"/>-->
+
+
             <Button x:Name="BtnUndo"
                     Content="Отмена"
                     Width="120" Height="40"
@@ -32,15 +39,22 @@
                     Margin="5"
                     Click="BtnRating_Click"/>
             
+            <Button x:Name="BtnSelectPlayer"
+                    Content="-"
+                    Width="120" Height="40"
+                    Margin="5"
+                    Click="BtnSelectPlayer_Click"/>
+
+
             <ComboBox x:Name="DifficultyBox"
-                      SelectionChanged="DifficultyBox_SelectionChanged"
-                 Width="120" Height="40"
-                 Margin="5"
-                 HorizontalContentAlignment="Center"
-                 VerticalContentAlignment="Center">
-                <ComboBoxItem Content="Лёгкий"/>
-                <ComboBoxItem Content="Средний"/>
-                <ComboBoxItem Content="Сложный"/>
+                     SelectionChanged="DifficultyBox_SelectionChanged"
+                     Width="120" Height="40"
+                     Margin="5"
+                     HorizontalContentAlignment="Center"
+                     VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="Лёгкий"/>
+                    <ComboBoxItem Content="Средний"/>
+                    <ComboBoxItem Content="Сложный"/>
             </ComboBox>
 
 
@@ -55,6 +69,9 @@
                        Text="00:00"
                        VerticalAlignment="Center"
                        FontSize="20"/>
+            <TextBlock Text="Очки:" Margin="10 0 0 0" VerticalAlignment="Center"/>
+            <TextBlock x:Name="ScoreText" Text="0" VerticalAlignment="Center"/>
+
         </StackPanel>
 
         <!-- Основная область: поле + плитки -->
