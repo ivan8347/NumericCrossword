@@ -40,7 +40,6 @@
                     Click="BtnRating_Click"/>
             
             <Button x:Name="BtnSelectPlayer"
-                    Content="-"
                     Width="120" Height="40"
                     Margin="5"
                     Click="BtnSelectPlayer_Click"/>
@@ -57,10 +56,6 @@
                     <ComboBoxItem Content="Сложный"/>
             </ComboBox>
 
-
-
-
-
             <TextBlock Text="Время:" Margin="20,0,5,0"
                        VerticalAlignment="Center"
                        FontSize="20"/>
@@ -69,8 +64,17 @@
                        Text="00:00"
                        VerticalAlignment="Center"
                        FontSize="20"/>
-            <TextBlock Text="Очки:" Margin="10 0 0 0" VerticalAlignment="Center"/>
-            <TextBlock x:Name="ScoreText" Text="0" VerticalAlignment="Center"/>
+            <TextBlock Text="Очки: " 
+                       FontSize="20" 
+                       Margin="20"
+                       VerticalAlignment="Center"/>
+            <TextBlock x:Name="ScoreText"
+                       Margin="5" 
+                       FontSize="22" 
+                       Foreground="SteelBlue" 
+                       FontWeight="Bold" 
+                       Text="0" 
+                       VerticalAlignment="Center"/>
 
         </StackPanel>
 

@@ -28,7 +28,7 @@ namespace NumericCrossword
                 //                place == 3 ? "🥉" : $"{place}.";
 
                 ListScores.Items.Add(
-                    $"{place}  - {s.Name} — {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
+                    $"{place}  - {s.Name} — {s.Score} очков - {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
                 );
 
                 place++;

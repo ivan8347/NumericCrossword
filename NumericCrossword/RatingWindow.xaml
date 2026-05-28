@@ -4,7 +4,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Width="500" Height="350"
+        Width="550" Height="350"
         WindowStartupLocation="CenterOwner">
 
     <Border CornerRadius="20"

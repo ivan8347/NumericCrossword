@@ -816,8 +816,8 @@ namespace NumericCrossword
             timerValue = TimeSpan.Zero;   // сброс времени
             TimerText.Text = "00:00";
             timer.Start();
-            score = 0;
-            ScoreText.Text = "0";
+            //score = 0;
+            //ScoreText.Text = "0";
 
             CreateGrid();
             formulas = GenerateCrossword();
@@ -869,6 +869,9 @@ namespace NumericCrossword
                 // 4. Добавляем очки в профиль
                 p.TotalScore += score;
             }
+            CurrentPlayer.TotalScore = p.TotalScore;
+            BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
+
 
             // 5. Сохраняем обновлённый список игроков
             PlayerStorage.Save(players);
@@ -878,9 +881,9 @@ namespace NumericCrossword
             msg.Owner = this;
             msg.ShowDialog();
 
-            // 7. Показываем рейтинг
+          /*  // 7. Показываем рейтинг
             RatingWindow rw = new RatingWindow();
-            rw.ShowDialog();
+            rw.ShowDialog();*/
         }
 
 
@@ -960,7 +963,9 @@ namespace NumericCrossword
             if (ps.ShowDialog() == true)
             {
                 CurrentPlayer = ps.SelectedPlayer;
-                BtnSelectPlayer.Content = CurrentPlayer.Name;
+                BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
+
+                // BtnSelectPlayer.Content = CurrentPlayer.Name;
             }
         }
     }

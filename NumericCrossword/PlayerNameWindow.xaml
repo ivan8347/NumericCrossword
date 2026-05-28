@@ -7,7 +7,7 @@
         Background="#FF1E1E1E"
         AllowsTransparency="True">
 
-    <Border CornerRadius="15" BorderBrush="#55FFFFFF" BorderThickness="2" Padding="20">
+    <Border CornerRadius="25" BorderBrush="#55FFFFFF" BorderThickness="2" Padding="20">
         <StackPanel>
             <TextBlock Text="Введите имя игрока"
                        FontSize="22"
