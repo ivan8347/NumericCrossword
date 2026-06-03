@@ -1,7 +1,8 @@
 ﻿<Window x:Class="NumericCrossword.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Numeric Crossword" Height="730" Width="1100"
+        Title="Numeric Crossword" 
+         WindowState="Maximized"
         WindowStartupLocation="CenterScreen">
 
     <Grid Background="#FFE8C8D8">
@@ -40,6 +41,7 @@
                     Click="BtnRating_Click"/>
             
             <Button x:Name="BtnSelectPlayer"
+                    Content="Игрок"
                     Width="120" Height="40"
                     Margin="5"
                     Click="BtnSelectPlayer_Click"/>
@@ -64,17 +66,29 @@
                        Text="00:00"
                        VerticalAlignment="Center"
                        FontSize="20"/>
+            
             <TextBlock Text="Очки: " 
                        FontSize="20" 
-                       Margin="20"
+                       Margin="20 0 5 0"
                        VerticalAlignment="Center"/>
+            
             <TextBlock x:Name="ScoreText"
-                       Margin="5" 
                        FontSize="22" 
                        Foreground="SteelBlue" 
                        FontWeight="Bold" 
                        Text="0" 
                        VerticalAlignment="Center"/>
+            
+            <Button Content="Создать игру" 
+                        Margin="20 0 0 0"
+                        Click="BtnCreateGame_Click"/>
+
+            <TextBox x:Name="GameIdBox" 
+                        Width="100" 
+                        AllowDrop="False" />
+                
+            
+            <Button Content="Подключиться" Click="BtnJoinGame_Click"/>
 
         </StackPanel>
 

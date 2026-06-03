@@ -12,7 +12,6 @@ using NumericCrossword.Core;
 
 
 
-
 namespace NumericCrossword
 {
     class Formula
@@ -60,6 +59,10 @@ namespace NumericCrossword
         private string currentDifficulty = "Лёгкий";
         //private bool isPaused = false;
 
+        private string currentGameId;
+       // private Random rnd;
+       private Random rnd = new Random();
+
 
 
         private Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> cellUndoStack
@@ -68,7 +71,6 @@ namespace NumericCrossword
         private Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> undoStack
             = new Stack<(int, int, string, string, bool)>();
 
-        private Random rnd = new Random();
 
         private List<CrosswordTemplate> templatesEasy = new List<CrosswordTemplate>();
 
@@ -84,13 +86,13 @@ namespace NumericCrossword
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
 
-            PlayerSelectWindow ps = new PlayerSelectWindow();
+            /*PlayerSelectWindow ps = new PlayerSelectWindow();
 
             if (ps.ShowDialog() == true)
                 CurrentPlayer = ps.SelectedPlayer;
             else
                 CurrentPlayer = new PlayerProfile { Name = "Игрок" };
-            BtnSelectPlayer.Content = CurrentPlayer.Name;
+            BtnSelectPlayer.Content = CurrentPlayer.Name;*/
         }
 
         // -----------------------------
@@ -107,7 +109,7 @@ namespace NumericCrossword
                 CrosswordGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });
 
             for (int c = 0; c < Cols; c++)
-                CrosswordGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
+                CrosswordGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
 
             cells = new Label[Rows, Cols];
 
@@ -117,7 +119,7 @@ namespace NumericCrossword
                 {
                     Label cell = new Label
                     {
-                        Width = 40,
+                        Width = 50,
                         Height = 40,
                         BorderBrush = Brushes.LightGray,
                         BorderThickness = new Thickness(1),
@@ -170,7 +172,6 @@ namespace NumericCrossword
                 cell.BorderThickness = new Thickness(3);
             }
         }
-
         private void InsertValueIntoCell(Label cell, string value)
         {
             if ((string)cell.Tag != "hidden")
@@ -196,7 +197,7 @@ namespace NumericCrossword
             cell.BorderThickness = new Thickness(5);
 
             // 🎯 НАЧИСЛЕНИЕ ОЧКОВ
-            int add = 0;
+          /*  int add = 0;
 
             switch (currentDifficulty)
             {
@@ -206,7 +207,7 @@ namespace NumericCrossword
             }
 
             score += add;
-            ScoreText.Text = score.ToString();
+            ScoreText.Text = score.ToString();*/
             // -------------------------------
 
             if (IsCrosswordSolved())
@@ -816,8 +817,8 @@ namespace NumericCrossword
             timerValue = TimeSpan.Zero;   // сброс времени
             TimerText.Text = "00:00";
             timer.Start();
-            //score = 0;
-            //ScoreText.Text = "0";
+            score = 0;
+            ScoreText.Text = "0";
 
             CreateGrid();
             formulas = GenerateCrossword();
@@ -844,47 +845,109 @@ namespace NumericCrossword
 
         // КОНЕЦ ИГРЫ
 
-        private void ShowWinMessage()
+        /* private async void ShowWinMessage()
+         {
+             timer.Stop();
+
+             // 1. Сохраняем локальный рекорд
+             ScoreStorage.AddRecord(new ScoreRecord
+             {
+                 Name = MainWindow.CurrentPlayer.Name,
+                 Difficulty = currentDifficulty,
+                 Time = timerValue,
+                 Score = score,
+                 Date = DateTime.Now
+             });
+
+             // 2. Загружаем всех игроков
+             var players = PlayerStorage.Load();
+
+             // 3. Находим текущего игрока
+             var p = players.FirstOrDefault(x => x.Name == MainWindow.CurrentPlayer.Name);
+
+             if (p != null)
+             {
+                 // 4. Добавляем очки в профиль
+                 p.TotalScore += score;
+             }
+
+             CurrentPlayer.TotalScore = p.TotalScore;
+             BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
+
+             // 5. Сохраняем обновлённый список игроков
+             PlayerStorage.Save(players);
+
+             // 6. Отправляем результат на сервер
+             if (!string.IsNullOrEmpty(currentGameId))
+             {
+                 await GameApi.SendResult(
+                     currentGameId,
+                     CurrentPlayer.Name,
+                     score,
+                     (int)timerValue.TotalSeconds
+                 );
+             }
+
+             // 7. Показываем окно победы
+             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
+             msg.Owner = this;
+             msg.ShowDialog();
+         }*/
+        private async void ShowWinMessage()
         {
             timer.Stop();
 
-            // 1. Сохраняем рекорд
+            // 1. РАСЧЁТ ИТОГОВОГО СЧЁТА
+            int totalScore = CalculateFinalScore();
+            score = totalScore;
+            ScoreText.Text = totalScore.ToString();
+
+            // 2. Сохраняем локальный рекорд
             ScoreStorage.AddRecord(new ScoreRecord
             {
                 Name = MainWindow.CurrentPlayer.Name,
                 Difficulty = currentDifficulty,
                 Time = timerValue,
-                Score = score,
+                Score = totalScore,
                 Date = DateTime.Now
             });
 
-            // 2. Загружаем всех игроков
+            // 3. Загружаем всех игроков
             var players = PlayerStorage.Load();
 
-            // 3. Находим текущего игрока
+            // 4. Находим текущего игрока
             var p = players.FirstOrDefault(x => x.Name == MainWindow.CurrentPlayer.Name);
 
             if (p != null)
             {
-                // 4. Добавляем очки в профиль
-                p.TotalScore += score;
+                // 5. Добавляем очки в профиль
+                p.TotalScore += totalScore;
             }
+
             CurrentPlayer.TotalScore = p.TotalScore;
             BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
 
-
-            // 5. Сохраняем обновлённый список игроков
+            // 6. Сохраняем обновлённый список игроков
             PlayerStorage.Save(players);
 
-            // 6. Показываем окно победы
-            WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
+            // 7. Отправляем результат на сервер
+            if (!string.IsNullOrEmpty(currentGameId))
+            {
+                await GameApi.SendResult(
+                    currentGameId,
+                    CurrentPlayer.Name,
+                    totalScore,
+                    (int)timerValue.TotalSeconds
+                );
+            }
+
+            // 8. Показываем окно победы
+            WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!\nОчки: " + totalScore);
             msg.Owner = this;
             msg.ShowDialog();
-
-          /*  // 7. Показываем рейтинг
-            RatingWindow rw = new RatingWindow();
-            rw.ShowDialog();*/
         }
+
+
 
 
         private bool IsCrosswordSolved()
@@ -968,5 +1031,88 @@ namespace NumericCrossword
                 // BtnSelectPlayer.Content = CurrentPlayer.Name;
             }
         }
+        private async void BtnCreateGame_Click(object sender, RoutedEventArgs e)
+        {
+            var info = await GameApi.CreateGame("Лёгкий");
+
+            MessageBox.Show($"Код игры: {info.GameId}");
+
+            currentGameId = info.GameId;
+            InitRandom(info.Seed);
+
+            StartNewGame();
+        }
+
+        private async void BtnJoinGame_Click(object sender, RoutedEventArgs e)
+        {
+            string id = GameIdBox.Text.Trim();
+
+            var info = await GameApi.GetGame(id);
+
+            currentGameId = info.GameId;
+            InitRandom(info.Seed);
+            
+
+            StartNewGame();
+        }
+        private void StartNewGame()
+        {
+            undoStack.Clear();
+            timer.Stop();
+            timerValue = TimeSpan.Zero;
+            TimerText.Text = "00:00";
+            timer.Start();
+
+            score = 0; // ОБНУЛЯЕМ СЧЁТ
+            ScoreText.Text = "0";
+
+            CreateGrid();
+            formulas = GenerateCrossword();
+            ApplyDifficulty(formulas);
+            DrawFormulas(formulas);
+            CreateTilesFromFormulas(formulas);
+        }
+        private int CalculateFinalScore()
+        {
+            int baseScorePerFormula = 0;
+
+            switch (currentDifficulty)
+            {
+                case "Лёгкий":
+                    baseScorePerFormula = 1;
+                    break;
+                case "Средний":
+                    baseScorePerFormula = 5;
+                    break;
+                case "Сложный":
+                    baseScorePerFormula = 10;
+                    break;
+                default:
+                    baseScorePerFormula = 2;
+                    break;
+            }
+
+            // Умножаем на количество формул
+            int totalFormulas = formulas.Count;
+            int score = baseScorePerFormula * totalFormulas;
+
+            // Бонус за скорость: чем быстрее решили, тем больше бонус
+            double minutesElapsed = timerValue.TotalMinutes;
+            if (minutesElapsed < 5)
+                score += 100; // большой бонус за быстрое решение
+            else if (minutesElapsed < 10)
+                score += 20; // средний бонус
+
+            return score;
+        }
+
+
+
+
+        private void InitRandom(int seed)
+        {
+            rnd = new Random(seed);
+        }
+
     }
 }

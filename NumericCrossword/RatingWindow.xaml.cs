@@ -1,7 +1,9 @@
 ﻿using System.Windows;
+using System.IO;
 using NumericCrossword.Core;      // где лежит ScoreStorage
 using NumericCrossword.Models;   // где лежит ScoreRecord
 using System.Linq;
+using System;
 
 namespace NumericCrossword
 {
@@ -23,9 +25,9 @@ namespace NumericCrossword
             int place = 1;
             foreach (var s in ordered)
             {
-                //string medal =  place == 1 ? "🥇" :
-                //                place == 2 ? "🥈" :
-                //                place == 3 ? "🥉" : $"{place}.";
+               /* string medal =  place == 1 ? "🥇" :
+                                place == 2 ? "🥈" :
+                                place == 3 ? "🥉" : $"{place}.";*/
 
                 ListScores.Items.Add(
                     $"{place}  - {s.Name} — {s.Score} очков - {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
@@ -39,5 +41,19 @@ namespace NumericCrossword
         {
             Close();
         }
+
+        private void BtnClear_Click(object sender, RoutedEventArgs e)
+        {
+            // Очищаем сохранённые данные (вызываем метод из ScoreStorage)
+            ScoreStorage.Clear();
+
+            // Обновляем список в окне (перезагружаем данные)
+            var scores = ScoreStorage.Load();
+            ListScores.Items.Clear();
+
+        }
+       
+
+
     }
 }

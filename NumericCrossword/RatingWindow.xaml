@@ -4,7 +4,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Width="550" Height="350"
+        Width="550" Height="450"
         WindowStartupLocation="CenterOwner">
 
     <Border CornerRadius="20"
@@ -13,7 +13,7 @@
             BorderThickness="2"
             Padding="20">
 
-        <StackPanel>
+        <StackPanel >
 
             <TextBlock Text="Рейтинг"
                        FontSize="32"
@@ -27,15 +27,27 @@
                      BorderThickness="0"
                      Foreground="White"
                      FontSize="20"/>
-
+            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center">
+                
             <Button Content="OK"
-                    Width="120" Height="40"
+                    Width="140" Height="40"
                     HorizontalAlignment="Center"
                     Margin="0 20 0 0"
                     Click="Ok_Click"
                     Background="#AA000000"
                     Foreground="White"
                     BorderThickness="0"/>
+
+            <Button x:Name="BtnClear"
+                     Content="Очистить рейтинг"
+                     Width="140" Height="40"
+                     HorizontalAlignment="Center"
+                     Margin="10 20 0 0"
+                     Background="#AA000000"
+                     Foreground="White"
+                     BorderThickness="0"
+                    Click=" BtnClear_Click"/>
+            </StackPanel>
         </StackPanel>
 
     </Border>
