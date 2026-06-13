@@ -78,17 +78,9 @@
                        FontWeight="Bold" 
                        Text="0" 
                        VerticalAlignment="Center"/>
-            
-            <Button Content="Создать игру" 
-                        Margin="20 0 0 0"
-                        Click="BtnCreateGame_Click"/>
-
-            <TextBox x:Name="GameIdBox" 
-                        Width="100" 
-                        AllowDrop="False" />
+           
                 
-            
-            <Button Content="Подключиться" Click="BtnJoinGame_Click"/>
+          
 
         </StackPanel>
 

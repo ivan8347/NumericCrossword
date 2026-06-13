@@ -3,139 +3,34 @@
     {
       "name": "cross_center",
       "slots": [
-        {
-          "row": 1,
-          "col": 1,
-          "horizontal": true
-        },
-        {
-          "row": 3,
-          "col": 1,
-          "horizontal": true
-        },
-        {
-          "row": 7,
-          "col": 4,
-          "horizontal": true
-        },
-        {
-          "row": 5,
-          "col": 5,
-          "horizontal": true
-        },
-        {
-          "row": 1,
-          "col": 5,
-          "horizontal": true
-        },
-        {
-          "row": 7,
-          "col": 8,
-          "horizontal": true
-        },
-        {
-          "row": 7,
-          "col": 11,
-          "horizontal": true
-        },
-        {
-          "row": 11,
-          "col": 11,
-          "horizontal": true
-        },
-        {
-          "row": 13,
-          "col": 15,
-          "horizontal": true
-        },
-        {
-          "row": 5,
-          "col": 9,
-          "horizontal": true
-        },
-        {
-          "row": 5,
-          "col": 9,
-          "horizontal": true
-        },
-        {
-          "row": 3,
-          "col": 15,
-          "horizontal": true
-        },
-        {
-          "row": 5,
-          "col": 9,
-          "horizontal": false
-        },
-        {
-          "row": 8,
-          "col": 9,
-          "horizontal": false
-        },
-        {
-          "row": 7,
-          "col": 11,
-          "horizontal": false
-        },
-        {
-          "row": 3,
-          "col": 5,
-          "horizontal": false
-        },
-        {
-          "row": 9,
-          "col": 13,
-          "horizontal": false
-        },
-        {
-          "row": 1,
-          "col": 11,
-          "horizontal": false
-        },
-        {
-          "row": 9,
-          "col": 15,
-          "horizontal": false
-        },
-        {
-          "row": 9,
-          "col": 19,
-          "horizontal": false
-        },
-        {
-          "row": 1,
-          "col": 19,
-          "horizontal": false
-        },
-        {
-          "row": 1,
-          "col": 1,
-          "horizontal": false
-        },
-        {
-          "row": 1,
-          "col": 3,
-          "horizontal": false
-        },
-        {
-          "row": 3,
-          "col": 15,
-          "horizontal": false
-        },
-        {
-          "row": 1,
-          "col": 9,
-          "horizontal": false
-        }
+        { "row": 1,   "col": 1,   "horizontal": true },
+        { "row": 3,   "col": 1,   "horizontal": true },
+        { "row": 7,   "col": 4,   "horizontal": true },
+        { "row": 5,   "col": 5,   "horizontal": true },
+        { "row": 1,   "col": 5,   "horizontal": true },
+        { "row": 7,   "col": 8,   "horizontal": true },
+        { "row": 7,   "col": 11,  "horizontal": true },
+        { "row": 11,  "col": 11,  "horizontal": true },
+        { "row": 13,  "col": 15,  "horizontal": true },
+        { "row": 5,  "col": 9,  "horizontal": true },
+        { "row": 5,  "col": 9,  "horizontal": true },
+        { "row": 3,  "col": 15,  "horizontal": true },
+        { "row": 5,   "col": 9,   "horizontal": false },
+        { "row": 8,   "col": 9,   "horizontal": false },
+        { "row": 7,   "col": 11,  "horizontal": false },
+        { "row": 3,   "col": 5,   "horizontal": false },
+        { "row": 9,   "col": 13,  "horizontal": false },
+        { "row": 1,   "col": 11,  "horizontal": false },
+        { "row": 9,   "col": 15,  "horizontal": false },
+        { "row": 9,   "col": 19,  "horizontal": false },
+        { "row": 1,   "col": 19,  "horizontal": false },
+        { "row": 1,   "col": 1,   "horizontal": false },
+        { "row": 1,   "col": 3,   "horizontal": false },
+        { "row": 3,   "col": 15,   "horizontal": false },
+        { "row": 1,   "col": 9,   "horizontal": false }
 
       ]
     }
-
-
-
-
-
   ]
 
 }

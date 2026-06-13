@@ -115,7 +115,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CrosswordGenerator.cs" />
     <Compile Include="GameApi.cs" />
+    <Compile Include="Models\Formula.cs" />
     <Compile Include="Models\FormulaSlot.cs" />
     <Compile Include="Models\PlayerProfile.cs" />
     <Compile Include="Models\PlayerStorage.cs" />
@@ -123,9 +125,7 @@
     <Compile Include="Models\ScoreStorage.cs" />
     <Compile Include="Models\TemplateFile.cs" />
     <Compile Include="Models\TemplateJson.cs" />
-    <Compile Include="PlayerNameWindow.xaml.cs">
-      <DependentUpon>PlayerNameWindow.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="PlayerNameWindow.cs" />
     <Compile Include="PlayerSelectWindow.xaml.cs">
       <DependentUpon>PlayerSelectWindow.xaml</DependentUpon>
     </Compile>
@@ -146,7 +146,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="PlayerNameWindow.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PlayerSelectWindow.xaml">
@@ -165,7 +164,9 @@
   <ItemGroup>
     <None Include="Data\players.json" />
     <None Include="Data\scores.json" />
-    <None Include="Data\templates_easy.json" />
+    <Content Include="Data\templates_easy.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -14,28 +14,6 @@ using NumericCrossword.Core;
 
 namespace NumericCrossword
 {
-    class Formula
-    {
-        public int Row;
-        public int Col;
-        public bool Horizontal;
-
-        public int A;
-        public int B;
-        public int C;
-        public char Op;
-
-        public bool HideA;
-        public bool HideB;
-        public bool HideC;
-    }
-
-    class FormulaSlot
-    {
-        public int Row;
-        public int Col;
-        public bool Horizontal;
-    }
 
     class CrosswordTemplate
     {
@@ -57,7 +35,6 @@ namespace NumericCrossword
         private string selectedTileValue = null;
         private Label selectedTileLabel = null;
         private string currentDifficulty = "Лёгкий";
-        //private bool isPaused = false;
 
         private string currentGameId;
        // private Random rnd;
@@ -85,14 +62,6 @@ namespace NumericCrossword
             InitTimer();
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
-
-            /*PlayerSelectWindow ps = new PlayerSelectWindow();
-
-            if (ps.ShowDialog() == true)
-                CurrentPlayer = ps.SelectedPlayer;
-            else
-                CurrentPlayer = new PlayerProfile { Name = "Игрок" };
-            BtnSelectPlayer.Content = CurrentPlayer.Name;*/
         }
 
         // -----------------------------
@@ -498,7 +467,7 @@ namespace NumericCrossword
         {
             templatesEasy.Clear();
 
-            string path = "Data/templates_easy.json";
+            string path = GetFilePath("templates_easy.json");
 
             if (!File.Exists(path))
             {
@@ -507,13 +476,11 @@ namespace NumericCrossword
             }
 
             string json = File.ReadAllText(path);
-
             var data = Newtonsoft.Json.JsonConvert.DeserializeObject<TemplateFile>(json);
 
             foreach (var t in data.templates)
             {
                 CrosswordTemplate ct = new CrosswordTemplate();
-
                 foreach (var s in t.slots)
                 {
                     ct.Slots.Add(new FormulaSlot
@@ -523,10 +490,15 @@ namespace NumericCrossword
                         Horizontal = s.Horizontal
                     });
                 }
-
                 templatesEasy.Add(ct);
             }
         }
+
+        private string GetFilePath(string fileName)
+        {
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", fileName);
+        }
+
 
         //  ЗАПИСЬ ФОРМУЛЫ В СЕТКУ
         private void PlaceFormulaToGrid(Formula f, string[,] grid)
@@ -1031,30 +1003,9 @@ namespace NumericCrossword
                 // BtnSelectPlayer.Content = CurrentPlayer.Name;
             }
         }
-        private async void BtnCreateGame_Click(object sender, RoutedEventArgs e)
-        {
-            var info = await GameApi.CreateGame("Лёгкий");
+       
 
-            MessageBox.Show($"Код игры: {info.GameId}");
-
-            currentGameId = info.GameId;
-            InitRandom(info.Seed);
-
-            StartNewGame();
-        }
-
-        private async void BtnJoinGame_Click(object sender, RoutedEventArgs e)
-        {
-            string id = GameIdBox.Text.Trim();
-
-            var info = await GameApi.GetGame(id);
-
-            currentGameId = info.GameId;
-            InitRandom(info.Seed);
-            
-
-            StartNewGame();
-        }
+       
         private void StartNewGame()
         {
             undoStack.Clear();
