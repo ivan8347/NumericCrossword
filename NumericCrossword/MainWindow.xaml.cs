@@ -70,7 +70,10 @@ namespace NumericCrossword
             {
                 FileName = "dotnet",
                 Arguments = "CrosswordServer.dll",
-                WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Server"),
+                WorkingDirectory = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\Server"
+                ),
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden
@@ -78,6 +81,7 @@ namespace NumericCrossword
 
             Process.Start(psi);
         }
+
 
         // -----------------------------
         //  СОЗДАНИЕ СЕТКИ
@@ -1079,10 +1083,10 @@ namespace NumericCrossword
         }
         private void BtnOnline_Click(object sender, RoutedEventArgs e)
         {
-            //try
-            //{
-            //   // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
-            //}
+            try
+            {
+               // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
+            }
             catch { }
             StartServerHidden(); 
             GameListWindow win = new GameListWindow();
