@@ -78,9 +78,13 @@
                        FontWeight="Bold" 
                        Text="0" 
                        VerticalAlignment="Center"/>
-           
-                
-          
+
+            <Button x:Name="BtnOnline"
+                    Content="Сетевая игра"
+                    Width="140" Height="40" 
+                    Margin="5" Click="BtnOnline_Click"/>
+
+
 
         </StackPanel>
 

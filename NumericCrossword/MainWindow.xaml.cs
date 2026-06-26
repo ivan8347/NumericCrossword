@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using NumericCrossword.Models;
 using NumericCrossword.Core;
+using System.Diagnostics;
 
 
 
@@ -62,6 +63,20 @@ namespace NumericCrossword
             InitTimer();
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
+        }
+        private void StartServerHidden()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "CrosswordServer.dll",
+                WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Server"),
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            Process.Start(psi);
         }
 
         // -----------------------------
@@ -1058,12 +1073,68 @@ namespace NumericCrossword
         }
 
 
-
-
         private void InitRandom(int seed)
         {
             rnd = new Random(seed);
         }
+        private void BtnOnline_Click(object sender, RoutedEventArgs e)
+        {
+            //try
+            //{
+            //   // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
+            //}
+            catch { }
+            StartServerHidden(); 
+            GameListWindow win = new GameListWindow();
+            win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
+            win.CurrentDifficulty = currentDifficulty;
+
+            win.Owner = this;
+            win.ShowDialog();
+
+            if (win.SelectedGameId != null)
+            {
+             // После закрытия окна выбора игры мы получаем ID выбранной игры
+
+                currentGameId = win.SelectedGameId;
+
+                // Запускаем сетевую игру, передавая gameId в метод
+                // (раньше параметр не передавался — отсюда была ошибка CS7036)
+                StartOnlineGame(currentGameId);
+
+            }
+        }
+        // Запуск сетевой игры после выбора или создания
+        // Этот метод вызывается после того, как GameListWindow вернул GameId
+        // Здесь мы получаем полную информацию об игре с сервера,
+        // инициализируем генератор кроссворда и запускаем сетевую партию
+        private async void StartOnlineGame(string gameId)
+        {
+            // 1) Загружаем полную информацию об игре с сервера
+            //    Нам нужен seed, чтобы сгенерировать такой же кроссворд,
+            //    как у всех остальных игроков
+            var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
+
+
+            if (info == null)
+            {
+                MessageBox.Show("Ошибка: не удалось получить данные игры");
+                return;
+            }
+
+            // 2) Инициализируем генератор случайных чисел одинаковым seed
+            //    Это гарантирует, что у всех игроков будет одинаковый кроссворд
+            InitRandom(info.Seed);
+
+            // 3) Генерируем кроссворд на основе seed
+            //    Здесь вызывается твой существующий генератор
+            GenerateCrossword();
+
+            // 4) Показываем игроку, что он подключён к сетевой игре
+            MessageBox.Show("Вы подключены к игре: " + gameId);
+        }
+       
+
 
     }
 }

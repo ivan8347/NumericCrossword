@@ -4,11 +4,9 @@ using NumericCrossword.Models;
 
 namespace NumericCrossword.Core
 {
-    /// <summary>
     /// Генератор кроссворда.
     /// Принимает seed, сложность и шаблон.
     /// Возвращает список формул, готовых к отрисовке.
-    /// </summary>
     public class CrosswordGenerator
     {
         private Random rnd;
@@ -20,9 +18,7 @@ namespace NumericCrossword.Core
             rnd = new Random(seed);
         }
 
-        /// <summary>
         /// Главный метод генерации.
-        /// </summary>
         public List<Formula> Generate(TemplateJson template, string difficulty)
         {
             List<Formula> result = new List<Formula>();
@@ -43,9 +39,7 @@ namespace NumericCrossword.Core
             return result;
         }
 
-        /// <summary>
         /// Генерация одной формулы в зависимости от сложности.
-        /// </summary>
         private Formula GenerateFormula(string difficulty)
         {
             int a, b, c;
@@ -90,18 +84,14 @@ namespace NumericCrossword.Core
             };
         }
 
-        /// <summary>
         /// Выбор случайного оператора.
-        /// </summary>
         private char PickOp(params string[] ops)
         {
             string s = ops[rnd.Next(ops.Length)];
             return s[0];
         }
 
-        /// <summary>
         /// Вычисление результата формулы.
-        /// </summary>
         private int Calculate(int a, int b, char op)
         {
             switch (op)

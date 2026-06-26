@@ -39,6 +39,7 @@ namespace NumericCrossword.Core
         public string Creator { get; set; }
         public List<string> Players { get; set; }
         public string Status { get; set; }
+        public string Difficulty { get; set; }
     }
 
     // ---------------------------------------------------------
@@ -70,7 +71,7 @@ namespace NumericCrossword.Core
         private static readonly HttpClient http = new HttpClient
         {
             // Адрес твоего сервера
-            BaseAddress = new Uri("http://localhost:5270/"),
+            BaseAddress = new Uri("http://localhost:5000/"),
 
             // Ограничиваем время ожидания ответа
             Timeout = TimeSpan.FromSeconds(5)
@@ -129,17 +130,17 @@ namespace NumericCrossword.Core
         // ---------------------------------------------------------
         // 3) Подключиться к существующей игре
         // ---------------------------------------------------------
-        public static async Task<GameInfo> JoinGame(string gameId, string playerName)
+        public static async Task<GameInfo> JoinGame(string gameId, string playerName, string difficulty)
         {
             try
             {
                 var body = new
                 {
                     gameId,
-                    playerName
+                    playerName,
+                    difficulty
                 };
 
-                // POST /game/join
                 var response = await http.PostAsJsonAsync("game/join", body);
                 response.EnsureSuccessStatusCode();
 
@@ -150,6 +151,7 @@ namespace NumericCrossword.Core
                 return null;
             }
         }
+
 
         // ---------------------------------------------------------
         // 4) Отправить результат игрока
@@ -180,6 +182,12 @@ namespace NumericCrossword.Core
             {
                 return false;
             }
+
         }
+        public static async Task<string> RawGamesJson()
+        {
+            return await http.GetStringAsync("games");
+        }
+
     }
 }
