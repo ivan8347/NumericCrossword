@@ -28,6 +28,7 @@ namespace NumericCrossword.Core
 
         // Список игроков, подключённых к игре
         public List<string> Players { get; set; }
+        public DateTime StartTime { get; set; }
     }
 
     // ---------------------------------------------------------
@@ -71,7 +72,8 @@ namespace NumericCrossword.Core
         private static readonly HttpClient http = new HttpClient
         {
             // Адрес твоего сервера
-            BaseAddress = new Uri("http://localhost:5000/"),
+            BaseAddress = new Uri("http://192.168.0.18:5270/"),
+
 
             // Ограничиваем время ожидания ответа
             Timeout = TimeSpan.FromSeconds(5)

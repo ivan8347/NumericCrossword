@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using NumericCrossword.Models;
 using NumericCrossword.Core;
 using System.Diagnostics;
+using System.Net.Http;
 
 
 
@@ -40,6 +41,8 @@ namespace NumericCrossword
         private string currentGameId;
        // private Random rnd;
        private Random rnd = new Random();
+        private DateTime serverStartTime;
+
 
 
 
@@ -64,7 +67,7 @@ namespace NumericCrossword
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
         }
-        private void StartServerHidden()
+      /*  private void StartServerHidden()
         {
             var psi = new ProcessStartInfo
             {
@@ -80,7 +83,7 @@ namespace NumericCrossword
             };
 
             Process.Start(psi);
-        }
+        }*/
 
 
         // -----------------------------
@@ -429,9 +432,10 @@ namespace NumericCrossword
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
-            TimerText.Text = timerValue.ToString(@"mm\:ss");
+            var elapsed = DateTime.UtcNow - serverStartTime;
+            TimerText.Text = elapsed.ToString(@"mm\\:ss");
         }
+
         //  ГЕНЕРАЦИЯ ОДНОЙ ФОРМУЛЫ
         private Formula GenerateRandomFormula()
         {
@@ -804,6 +808,10 @@ namespace NumericCrossword
         private void BtnNewGame_Click(object sender, RoutedEventArgs e)
         {
             undoStack.Clear();
+            cellUndoStack.Clear();
+            currentGameId = null;
+
+
             timer.Stop();
             timerValue = TimeSpan.Zero;   // сброс времени
             TimerText.Text = "00:00";
@@ -818,72 +826,7 @@ namespace NumericCrossword
             CreateTilesFromFormulas(formulas);
         }
 
-        /*private void BtnPause_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isPaused)
-            {
-                timer.Stop();
-                BtnPause.Content = "Продолжить";
-                isPaused = true;
-            }
-            else
-            {
-                timer.Start();
-                BtnPause.Content = "Пауза";
-                isPaused = false;
-            }
-        }*/
-
-        // КОНЕЦ ИГРЫ
-
-        /* private async void ShowWinMessage()
-         {
-             timer.Stop();
-
-             // 1. Сохраняем локальный рекорд
-             ScoreStorage.AddRecord(new ScoreRecord
-             {
-                 Name = MainWindow.CurrentPlayer.Name,
-                 Difficulty = currentDifficulty,
-                 Time = timerValue,
-                 Score = score,
-                 Date = DateTime.Now
-             });
-
-             // 2. Загружаем всех игроков
-             var players = PlayerStorage.Load();
-
-             // 3. Находим текущего игрока
-             var p = players.FirstOrDefault(x => x.Name == MainWindow.CurrentPlayer.Name);
-
-             if (p != null)
-             {
-                 // 4. Добавляем очки в профиль
-                 p.TotalScore += score;
-             }
-
-             CurrentPlayer.TotalScore = p.TotalScore;
-             BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
-
-             // 5. Сохраняем обновлённый список игроков
-             PlayerStorage.Save(players);
-
-             // 6. Отправляем результат на сервер
-             if (!string.IsNullOrEmpty(currentGameId))
-             {
-                 await GameApi.SendResult(
-                     currentGameId,
-                     CurrentPlayer.Name,
-                     score,
-                     (int)timerValue.TotalSeconds
-                 );
-             }
-
-             // 7. Показываем окно победы
-             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!");
-             msg.Owner = this;
-             msg.ShowDialog();
-         }*/
+       
         private async void ShowWinMessage()
         {
             timer.Stop();
@@ -1012,6 +955,8 @@ namespace NumericCrossword
         }
         private void BtnSelectPlayer_Click(object sender, RoutedEventArgs e)
         {
+            currentGameId = null;
+
             PlayerSelectWindow ps = new PlayerSelectWindow();
 
             if (ps.ShowDialog() == true)
@@ -1024,24 +969,7 @@ namespace NumericCrossword
         }
        
 
-       
-        private void StartNewGame()
-        {
-            undoStack.Clear();
-            timer.Stop();
-            timerValue = TimeSpan.Zero;
-            TimerText.Text = "00:00";
-            timer.Start();
-
-            score = 0; // ОБНУЛЯЕМ СЧЁТ
-            ScoreText.Text = "0";
-
-            CreateGrid();
-            formulas = GenerateCrossword();
-            ApplyDifficulty(formulas);
-            DrawFormulas(formulas);
-            CreateTilesFromFormulas(formulas);
-        }
+      
         private int CalculateFinalScore()
         {
             int baseScorePerFormula = 0;
@@ -1069,9 +997,9 @@ namespace NumericCrossword
             // Бонус за скорость: чем быстрее решили, тем больше бонус
             double minutesElapsed = timerValue.TotalMinutes;
             if (minutesElapsed < 5)
-                score += 100; // большой бонус за быстрое решение
-            else if (minutesElapsed < 10)
-                score += 20; // средний бонус
+                score += 10; // большой бонус за быстрое решение
+            else if (minutesElapsed < 5)
+                score += 5; // средний бонус
 
             return score;
         }
@@ -1088,7 +1016,7 @@ namespace NumericCrossword
                // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
             }
             catch { }
-            StartServerHidden(); 
+           // StartServerHidden(); 
             GameListWindow win = new GameListWindow();
             win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
             win.CurrentDifficulty = currentDifficulty;
@@ -1114,31 +1042,41 @@ namespace NumericCrossword
         // инициализируем генератор кроссворда и запускаем сетевую партию
         private async void StartOnlineGame(string gameId)
         {
-            // 1) Загружаем полную информацию об игре с сервера
-            //    Нам нужен seed, чтобы сгенерировать такой же кроссворд,
-            //    как у всех остальных игроков
             var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
-
 
             if (info == null)
             {
                 MessageBox.Show("Ошибка: не удалось получить данные игры");
                 return;
             }
+            timer.Stop();
 
-            // 2) Инициализируем генератор случайных чисел одинаковым seed
-            //    Это гарантирует, что у всех игроков будет одинаковый кроссворд
+            serverStartTime = info.StartTime;
+            timer.Start();
+            // одинаковый кроссворд для всех игроков
             InitRandom(info.Seed);
 
-            // 3) Генерируем кроссворд на основе seed
-            //    Здесь вызывается твой существующий генератор
-            GenerateCrossword();
+            // генерируем формулы
+            formulas = GenerateCrossword();
 
-            // 4) Показываем игроку, что он подключён к сетевой игре
+            // применяем сложность (скрываем числа)
+            ApplyDifficulty(formulas);
+
+            // рисуем кроссворд на экране
+            DrawFormulas(formulas);
+
+            // создаём плитки справа
+            CreateTilesFromFormulas(formulas);
+
             MessageBox.Show("Вы подключены к игре: " + gameId);
         }
-       
 
+
+
+        private readonly HttpClient _http = new HttpClient
+        {
+            BaseAddress = new Uri("http://localhost:5270") // адрес твоего сервера
+        };
 
     }
 }

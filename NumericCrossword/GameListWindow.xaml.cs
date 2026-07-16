@@ -26,13 +26,14 @@ namespace NumericCrossword
         {
             try
             {
-                var games = await GameApi.GetGames(); // ← ИСПРАВЛЕНО
+                var games = await GameApi.GetGames(); 
                 GamesList.ItemsSource = games;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка загрузки игр: " + ex.Message);
             }
+
         }
 
         // Кнопка "Обновить"
