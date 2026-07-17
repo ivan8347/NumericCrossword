@@ -432,9 +432,14 @@ namespace NumericCrossword
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            var elapsed = DateTime.UtcNow - serverStartTime;
-            TimerText.Text = elapsed.ToString(@"mm\\:ss");
+            // Просто увеличиваем накопленное время на 1 секунду
+            timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
+
+            // Форматируем и выводим (mm:ss)
+            if (TimerText != null)
+                TimerText.Text = timerValue.ToString(@"mm\:ss");
         }
+
 
         //  ГЕНЕРАЦИЯ ОДНОЙ ФОРМУЛЫ
         private Formula GenerateRandomFormula()
@@ -811,22 +816,43 @@ namespace NumericCrossword
             cellUndoStack.Clear();
             currentGameId = null;
 
-
             timer.Stop();
-            timerValue = TimeSpan.Zero;   // сброс времени
-            TimerText.Text = "00:00";
-            timer.Start();
+
+            // СБРОС ВРЕМЕНИ
+            timerValue = TimeSpan.Zero;
+            if (TimerText != null) TimerText.Text = "00:00";
+
             score = 0;
             ScoreText.Text = "0";
 
-            CreateGrid();
+            serverStartTime = DateTime.UtcNow;
+
+            // --- ДОБАВИТЬ: ПОЛНАЯ ОЧИСТКА СЕТКИ ---
+            for (int r = 0; r < Rows; r++)
+            {
+                for (int c = 0; c < Cols; c++)
+                {
+                    var cell = cells[r, c];
+                    cell.Content = "";
+                    cell.Tag = null;
+                    cell.Background = Brushes.White;
+                    cell.BorderBrush = Brushes.LightGray;
+                    cell.BorderThickness = new Thickness(1);
+                }
+            }
+            // ---------------------------------------
+
+            CreateGrid(); // если нужно пересоздать разметку (обычно не требуется, если сетка уже создана)
             formulas = GenerateCrossword();
             ApplyDifficulty(formulas);
             DrawFormulas(formulas);
             CreateTilesFromFormulas(formulas);
+
+            timer.Start();
         }
 
-       
+
+
         private async void ShowWinMessage()
         {
             timer.Stop();
@@ -1042,33 +1068,73 @@ namespace NumericCrossword
         // инициализируем генератор кроссворда и запускаем сетевую партию
         private async void StartOnlineGame(string gameId)
         {
-            var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
-
-            if (info == null)
+            try
             {
-                MessageBox.Show("Ошибка: не удалось получить данные игры");
-                return;
+                // 1. Получаем данные с сервера
+                var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
+
+                if (info == null)
+                {
+                    MessageBox.Show("Ошибка: не удалось получить данные игры.");
+                    return;
+                }
+
+                // 2. ОСТАНАВЛИВАЕМ таймер (на случай, если он работал в фоновом режиме)
+                timer.Stop();
+
+                // 3. СБРАСЫВАЕМ ВРЕМЯ В НОЛЬ (Критически важно!)
+                timerValue = TimeSpan.Zero;
+
+                // Обновляем UI сразу, чтобы пользователь видел 00:00 до начала тиков
+                if (TimerText != null)
+                    TimerText.Text = "00:00";
+
+                // 4. ОЧИЩАЕМ ИНТЕРФЕЙС
+                TilesPanel.Children.Clear(); // Удаляем старые плитки
+                undoStack.Clear();
+                cellUndoStack.Clear();
+
+                // 5. ПЕРЕСОЗДАЕМ СЕТКУ
+                CreateGrid();
+
+                // 6. ГАРАНТИРОВАННО ЧИСТИМ ВСЕ ЯЧЕЙКИ (чтобы не было наложений старых чисел)
+                if (cells != null)
+                {
+                    for (int r = 0; r < Rows; r++)
+                    {
+                        for (int c = 0; c < Cols; c++)
+                        {
+                            var cell = cells[r, c];
+                            if (cell != null)
+                            {
+                                cell.Content = "";
+                                cell.Tag = null;
+                                cell.Background = Brushes.White;
+                                cell.BorderBrush = Brushes.LightGray;
+                                cell.BorderThickness = new Thickness(1);
+                            }
+                        }
+                    }
+                }
+
+                // 7. ИНИЦИАЛИЗАЦИЯ ГЕНЕРАЦИИ (ОДИНАКОВЫЙ СИД ДЛЯ ВСЕХ)
+                InitRandom(info.Seed);
+
+                // 8. ГЕНЕРАЦИЯ И ОТРИСОВКА
+                formulas = GenerateCrossword();
+                ApplyDifficulty(formulas);
+                DrawFormulas(formulas);
+                CreateTilesFromFormulas(formulas);
+
+                // 9. ЗАПУСКАЕМ ТАЙМЕР (Теперь он начнет тикать с 00:00)
+                timer.Start();
+
+                MessageBox.Show("Вы подключены к игре: " + gameId);
             }
-            timer.Stop();
-
-            serverStartTime = info.StartTime;
-            timer.Start();
-            // одинаковый кроссворд для всех игроков
-            InitRandom(info.Seed);
-
-            // генерируем формулы
-            formulas = GenerateCrossword();
-
-            // применяем сложность (скрываем числа)
-            ApplyDifficulty(formulas);
-
-            // рисуем кроссворд на экране
-            DrawFormulas(formulas);
-
-            // создаём плитки справа
-            CreateTilesFromFormulas(formulas);
-
-            MessageBox.Show("Вы подключены к игре: " + gameId);
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка сетевой игры: {ex.Message}");
+            }
         }
 
 
