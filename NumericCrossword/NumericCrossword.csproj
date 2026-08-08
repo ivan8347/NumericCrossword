@@ -146,6 +146,9 @@
     <Compile Include="Models\ScoreStorage.cs" />
     <Compile Include="Models\TemplateFile.cs" />
     <Compile Include="Models\TemplateJson.cs" />
+    <Compile Include="NetworkStatsWindow.xaml.cs">
+      <DependentUpon>NetworkStatsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PlayerNameWindow.cs" />
     <Compile Include="PlayersConverter.cs" />
     <Compile Include="PlayerSelectWindow.xaml.cs">
@@ -170,6 +173,10 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="NetworkStatsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PlayerNameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

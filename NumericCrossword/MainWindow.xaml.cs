@@ -31,6 +31,7 @@ namespace NumericCrossword
         private Label[,] cells = new Label[Rows, Cols];
 
         private DispatcherTimer timer;
+        private DispatcherTimer networkCheckTimer = new DispatcherTimer();
         private TimeSpan timerValue = TimeSpan.Zero;
 
 
@@ -39,9 +40,12 @@ namespace NumericCrossword
         private string currentDifficulty = "Лёгкий";
 
         private string currentGameId;
-       // private Random rnd;
-       private Random rnd = new Random();
+
+        // private Random rnd;
+        private Random rnd = new Random();
         private DateTime serverStartTime;
+        public static PlayerProfile CurrentPlayer;
+        public static int CurrentTotalPlayers = 0;
 
 
 
@@ -57,7 +61,6 @@ namespace NumericCrossword
 
         private List<Formula> formulas = new List<Formula>();
 
-        public static PlayerProfile CurrentPlayer;
 
         public MainWindow()
         {
@@ -66,24 +69,49 @@ namespace NumericCrossword
             InitTimer();
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
-        }
-      /*  private void StartServerHidden()
-        {
-            var psi = new ProcessStartInfo
+            networkCheckTimer.Interval = TimeSpan.FromSeconds(1);
+
+            networkCheckTimer.Tick += async (s, e) =>
             {
-                FileName = "dotnet",
-                Arguments = "CrosswordServer.dll",
-                WorkingDirectory = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    @"..\..\Server"
-                ),
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden
+                if (!string.IsNullOrEmpty(currentGameId))
+                {
+                    var results = await GameApi.GetResults(currentGameId);
+
+                    // ⭐ Показываем окно только когда ВСЕ игроки закончили
+                    if (results != null && results.Count == CurrentTotalPlayers)
+                    {
+                        networkCheckTimer.Stop();
+                        ShowWinMessage();
+                    }
+                }
             };
 
-            Process.Start(psi);
-        }*/
+            // Настройка игрового таймера
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += (s, e) =>
+            {
+                timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
+                TimerText.Text = timerValue.ToString(@"mm\:ss");
+            };
+        }
+        /*  private void StartServerHidden()
+          {
+              var psi = new ProcessStartInfo
+              {
+                  FileName = "dotnet",
+                  Arguments = "CrosswordServer.dll",
+                  WorkingDirectory = Path.Combine(
+                      AppDomain.CurrentDomain.BaseDirectory,
+                      @"..\..\Server"
+                  ),
+                  CreateNoWindow = true,
+                  UseShellExecute = false,
+                  WindowStyle = ProcessWindowStyle.Hidden
+              };
+
+              Process.Start(psi);
+          }*/
 
 
         // -----------------------------
@@ -94,7 +122,7 @@ namespace NumericCrossword
             CrosswordGrid.RowDefinitions.Clear();
             CrosswordGrid.ColumnDefinitions.Clear();
             CrosswordGrid.Children.Clear();
-           
+
 
             for (int r = 0; r < Rows; r++)
                 CrosswordGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });
@@ -188,17 +216,17 @@ namespace NumericCrossword
             cell.BorderThickness = new Thickness(5);
 
             // 🎯 НАЧИСЛЕНИЕ ОЧКОВ
-          /*  int add = 0;
+            /*  int add = 0;
 
-            switch (currentDifficulty)
-            {
-                case "Лёгкий": add = 1; break;
-                case "Средний": add = 5; break;
-                case "Сложный": add = 10; break;
-            }
+              switch (currentDifficulty)
+              {
+                  case "Лёгкий": add = 1; break;
+                  case "Средний": add = 5; break;
+                  case "Сложный": add = 10; break;
+              }
 
-            score += add;
-            ScoreText.Text = score.ToString();*/
+              score += add;
+              ScoreText.Text = score.ToString();*/
             // -------------------------------
 
             if (IsCrosswordSolved())
@@ -339,7 +367,7 @@ namespace NumericCrossword
                     // снять выделение
                     cells[selRow, selCol].BorderBrush = Brushes.LightGray;
                     cells[selRow, selCol].BorderThickness = new Thickness(1);
-                   // cells[selRow, selCol].Background = Brushes.LightYellow;
+                    // cells[selRow, selCol].Background = Brushes.LightYellow;
 
                     // очистить ВСЕ записи об этой ячейке из cellUndoStack
                     Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp2 =
@@ -853,44 +881,34 @@ namespace NumericCrossword
 
 
 
+
+        // ⭐ Финальная версия ShowWinMessage
         private async void ShowWinMessage()
         {
             timer.Stop();
 
-            // 1. РАСЧЁТ ИТОГОВОГО СЧЁТА
             int totalScore = CalculateFinalScore();
             score = totalScore;
             ScoreText.Text = totalScore.ToString();
 
-            // 2. Сохраняем локальный рекорд
             ScoreStorage.AddRecord(new ScoreRecord
             {
-                Name = MainWindow.CurrentPlayer.Name,
+                Name = CurrentPlayer.Name,
                 Difficulty = currentDifficulty,
                 Time = timerValue,
                 Score = totalScore,
                 Date = DateTime.Now
             });
 
-            // 3. Загружаем всех игроков
             var players = PlayerStorage.Load();
-
-            // 4. Находим текущего игрока
-            var p = players.FirstOrDefault(x => x.Name == MainWindow.CurrentPlayer.Name);
-
+            var p = players.FirstOrDefault(x => x.Name == CurrentPlayer.Name);
             if (p != null)
-            {
-                // 5. Добавляем очки в профиль
                 p.TotalScore += totalScore;
-            }
 
             CurrentPlayer.TotalScore = p.TotalScore;
             BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
-
-            // 6. Сохраняем обновлённый список игроков
             PlayerStorage.Save(players);
 
-            // 7. Отправляем результат на сервер
             if (!string.IsNullOrEmpty(currentGameId))
             {
                 await GameApi.SendResult(
@@ -899,13 +917,27 @@ namespace NumericCrossword
                     totalScore,
                     (int)timerValue.TotalSeconds
                 );
+
+                var results = await GameApi.GetResults(currentGameId);
+
+                if (results != null && results.Count == CurrentTotalPlayers)
+                {
+                    var statsWindow = new NetworkStatsWindow(results);
+                    statsWindow.Owner = this;
+                    statsWindow.ShowDialog();
+                }
+
+                return;
             }
 
-            // 8. Показываем окно победы
             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!\nОчки: " + totalScore);
             msg.Owner = this;
             msg.ShowDialog();
         }
+
+
+
+
 
 
 
@@ -993,9 +1025,9 @@ namespace NumericCrossword
                 // BtnSelectPlayer.Content = CurrentPlayer.Name;
             }
         }
-       
 
-      
+
+
         private int CalculateFinalScore()
         {
             int baseScorePerFormula = 0;
@@ -1039,10 +1071,10 @@ namespace NumericCrossword
         {
             try
             {
-               // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
+                // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
             }
             catch { }
-           // StartServerHidden(); 
+            // StartServerHidden(); 
             GameListWindow win = new GameListWindow();
             win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
             win.CurrentDifficulty = currentDifficulty;
@@ -1052,20 +1084,21 @@ namespace NumericCrossword
 
             if (win.SelectedGameId != null)
             {
-             // После закрытия окна выбора игры мы получаем ID выбранной игры
+                // После закрытия окна выбора игры мы получаем ID выбранной игры
 
                 currentGameId = win.SelectedGameId;
 
                 // Запускаем сетевую игру, передавая gameId в метод
-                // (раньше параметр не передавался — отсюда была ошибка CS7036)
                 StartOnlineGame(currentGameId);
 
             }
+
         }
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
         // Здесь мы получаем полную информацию об игре с сервера,
         // инициализируем генератор кроссворда и запускаем сетевую партию
+
         private async void StartOnlineGame(string gameId)
         {
             try
@@ -1078,7 +1111,8 @@ namespace NumericCrossword
                     MessageBox.Show("Ошибка: не удалось получить данные игры.");
                     return;
                 }
-
+                CurrentTotalPlayers = info.Players.Count;//------------
+               
                 // 2. ОСТАНАВЛИВАЕМ таймер (на случай, если он работал в фоновом режиме)
                 timer.Stop();
 
@@ -1128,7 +1162,6 @@ namespace NumericCrossword
 
                 // 9. ЗАПУСКАЕМ ТАЙМЕР (Теперь он начнет тикать с 00:00)
                 timer.Start();
-
                 MessageBox.Show("Вы подключены к игре: " + gameId);
             }
             catch (Exception ex)
@@ -1136,6 +1169,8 @@ namespace NumericCrossword
                 MessageBox.Show($"Ошибка сетевой игры: {ex.Message}");
             }
         }
+
+
 
 
 

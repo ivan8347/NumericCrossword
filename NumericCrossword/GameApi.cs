@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace NumericCrossword.Core
 {
-    // ---------------------------------------------------------
     // Модель полной информации об игре, которую возвращает сервер
-    // ---------------------------------------------------------
     public class GameInfo
     {
         // Уникальный ID игры, создаётся сервером
@@ -30,10 +28,7 @@ namespace NumericCrossword.Core
         public List<string> Players { get; set; }
         public DateTime StartTime { get; set; }
     }
-
-    // ---------------------------------------------------------
     // Модель игры в списке игр (короткая версия)
-    // ---------------------------------------------------------
     public class GameItem
     {
         public string GameId { get; set; }
@@ -43,9 +38,7 @@ namespace NumericCrossword.Core
         public string Difficulty { get; set; }
     }
 
-    // ---------------------------------------------------------
     // Модель результата игрока
-    // ---------------------------------------------------------
     public class GameResult
     {
         public string PlayerName { get; set; }
@@ -53,18 +46,14 @@ namespace NumericCrossword.Core
         public int TimeSeconds { get; set; }
     }
 
-    // ---------------------------------------------------------
     // Ответ сервера после отправки результата
-    // ---------------------------------------------------------
     public class ResultResponse
     {
         // Если true — сервер удалил игру (все игроки закончили)
         public bool Deleted { get; set; }
     }
 
-    // ---------------------------------------------------------
     // Основной класс API для общения с сервером
-    // ---------------------------------------------------------
     public static class GameApi
     {
         // HttpClient создаётся один раз на всё приложение
@@ -79,9 +68,7 @@ namespace NumericCrossword.Core
             Timeout = TimeSpan.FromSeconds(5)
         };
 
-        // ---------------------------------------------------------
         // 1) Получить список всех игр
-        // ---------------------------------------------------------
         public static async Task<List<GameItem>> GetGames()
         {
             try
@@ -100,9 +87,7 @@ namespace NumericCrossword.Core
             }
         }
 
-        // ---------------------------------------------------------
         // 2) Создать новую игру
-        // ---------------------------------------------------------
         public static async Task<GameInfo> CreateGame(string creatorName, string difficulty)
         {
             try
@@ -129,9 +114,7 @@ namespace NumericCrossword.Core
             }
         }
 
-        // ---------------------------------------------------------
         // 3) Подключиться к существующей игре
-        // ---------------------------------------------------------
         public static async Task<GameInfo> JoinGame(string gameId, string playerName, string difficulty)
         {
             try
@@ -155,9 +138,7 @@ namespace NumericCrossword.Core
         }
 
 
-        // ---------------------------------------------------------
         // 4) Отправить результат игрока
-        // ---------------------------------------------------------
         public static async Task<bool> SendResult(string gameId, string playerName, int score, int timeSeconds)
         {
             try
@@ -186,6 +167,30 @@ namespace NumericCrossword.Core
             }
 
         }
+        public static async Task<List<GameResultDto>> GetResults(string gameId)
+        {
+            try
+            {
+                var resp = await http.GetAsync($"results/{gameId}");
+                resp.EnsureSuccessStatusCode();
+
+                var json = await resp.Content.ReadAsStringAsync();
+                return Newtonsoft.Json.JsonConvert
+                    .DeserializeObject<List<GameResultDto>>(json);
+            }
+            catch
+            {
+                return new List<GameResultDto>();
+            }
+        }
+
+        public class GameResultDto
+        {
+            public string PlayerName { get; set; }
+            public int Score { get; set; }
+            public int TimeSeconds { get; set; }
+        }
+
         public static async Task<string> RawGamesJson()
         {
             return await http.GetStringAsync("games");
