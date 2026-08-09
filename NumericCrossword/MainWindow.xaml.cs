@@ -31,8 +31,8 @@ namespace NumericCrossword
         private Label[,] cells = new Label[Rows, Cols];
 
         private DispatcherTimer timer;
-        private DispatcherTimer networkCheckTimer = new DispatcherTimer();
         private TimeSpan timerValue = TimeSpan.Zero;
+        private DispatcherTimer networkCheckTimer = new DispatcherTimer();
 
 
         private string selectedTileValue = null;
@@ -44,8 +44,8 @@ namespace NumericCrossword
         // private Random rnd;
         private Random rnd = new Random();
         private DateTime serverStartTime;
-        public static PlayerProfile CurrentPlayer;
         public static int CurrentTotalPlayers = 0;
+        public static PlayerProfile CurrentPlayer;
 
 
 
@@ -920,15 +920,38 @@ namespace NumericCrossword
 
                 var results = await GameApi.GetResults(currentGameId);
 
-                if (results != null && results.Count == CurrentTotalPlayers)
+                MessageBox.Show($"results.Count = {results?.Count}", "DEBUG");
+
+                if (results != null && results.Count > 0)
                 {
-                    var statsWindow = new NetworkStatsWindow(results);
-                    statsWindow.Owner = this;
-                    statsWindow.ShowDialog();
+                    try
+                    {
+                        var statsWindow = new NetworkStatsWindow(results);
+                        statsWindow.Owner = this;
+                        statsWindow.ShowDialog();
+                    }
+                    catch (Exception ex)
+                    {
+                        // ⭐ ВОТ СЮДА ВСТАВЛЯЕШЬ
+                        MessageBox.Show(ex.ToString(), "Ошибка при открытии NetworkStatsWindow");
+                    }
+
+                    // WinMessage со всеми результатами
+                    string allResultsText = "Результаты сетевой игры:\n\n";
+
+                    foreach (var r in results)
+                    {
+                        allResultsText += $"{r.PlayerName}: {r.Score} очков, время {TimeSpan.FromSeconds(r.TimeSeconds):mm\\:ss}\n";
+                    }
+
+                    WinMessage msg2 = new WinMessage(allResultsText);
+                    msg2.Owner = this;
+                    msg2.ShowDialog();
                 }
 
                 return;
             }
+
 
             WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!\nОчки: " + totalScore);
             msg.Owner = this;

@@ -136,6 +136,21 @@ namespace NumericCrossword.Core
                 return null;
             }
         }
+        public static async Task<GameInfo> GetGameInfo(string gameId)
+        {
+            try
+            {
+                // GET /game/info/{gameId}
+                var response = await http.GetAsync($"game/info/{gameId}");
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<GameInfo>();
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
 
         // 4) Отправить результат игрока
