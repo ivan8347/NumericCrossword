@@ -51,7 +51,6 @@ namespace NumericCrossword
                // var difficulty = CurrentDifficulty; // Лёгкий / Средний / Сложный
                 var info = await GameApi.CreateGame(CurrentPlayer.Name, CurrentDifficulty);
 
-                //var info = await GameApi.CreateGame(CurrentPlayer.Name, "Лёгкий");
 
 
                 if (info != null)

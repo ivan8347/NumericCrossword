@@ -11,8 +11,8 @@ using NumericCrossword.Models;
 using NumericCrossword.Core;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Threading.Tasks;
 using static NumericCrossword.Core.GameApi;
+using System.Threading.Tasks;
 
 
 
@@ -71,8 +71,31 @@ namespace NumericCrossword
             InitTimer();
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
+            networkCheckTimer.Interval = TimeSpan.FromSeconds(1);
 
+            networkCheckTimer.Tick += async (s, e) =>
+            {
+                if (!string.IsNullOrEmpty(currentGameId))
+                {
+                    var results = await GameApi.GetResults(currentGameId);
 
+                    // ⭐ Показываем окно только когда ВСЕ игроки закончили
+                    if (results != null && results.Count == CurrentTotalPlayers)
+                    {
+                        networkCheckTimer.Stop();
+                        ShowWinMessage();
+                    }
+                }
+            };
+
+            // Настройка игрового таймера
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += (s, e) =>
+            {
+                timerValue = timerValue.Add(TimeSpan.FromSeconds(1));
+                TimerText.Text = timerValue.ToString(@"mm\:ss");
+            };
         }
         /*  private void StartServerHidden()
           {
@@ -208,9 +231,8 @@ namespace NumericCrossword
               ScoreText.Text = score.ToString();*/
             // -------------------------------
 
-            if (IsCrosswordSolved() && string.IsNullOrEmpty(currentGameId))
+            if (IsCrosswordSolved())
                 ShowWinMessage();
-
         }
 
 
@@ -264,9 +286,8 @@ namespace NumericCrossword
             InsertValueIntoCell(cell, value);
             RemoveTile(value);
 
-            if (IsCrosswordSolved() && string.IsNullOrEmpty(currentGameId))
+            if (IsCrosswordSolved())
                 ShowWinMessage();
-
         }
 
         private void RemoveTile(string value)
@@ -498,7 +519,6 @@ namespace NumericCrossword
             };
         }
 
-        // ===== ЧАСТЬ 2 =====
         //  ШАБЛОНЫ
         private void InitTemplates()
         {
@@ -890,29 +910,30 @@ namespace NumericCrossword
             BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
             PlayerStorage.Save(players);
 
+
             if (!string.IsNullOrEmpty(currentGameId))
             {
-                // отправляем результат
-                MessageBox.Show($"DEBUG: totalScore={totalScore}, time={timerValue.TotalSeconds}");
+                await GameApi.SendResult(
+                    currentGameId,
+                    CurrentPlayer.Name,
+                    totalScore,
+                    (int)timerValue.TotalSeconds
+                );
 
-                await GameApi.SendResult(currentGameId, CurrentPlayer.Name, totalScore, (int)timerValue.TotalSeconds);
-
-
-                // ⭐ ЖДЁМ ПОКА ВСЕ ИГРОКИ ЗАВЕРШАТ
                 List<GameResultDto> results = null;
 
+                // ⭐ ЖДЁМ ВСЕХ ИГРОКОВ
                 while (true)
                 {
                     results = await GameApi.GetResults(currentGameId);
 
                     if (results != null && results.Count == CurrentTotalPlayers)
-                        break; // ВСЕ ЗАВЕРШИЛИ
+                        break;
 
-                     await Task.Delay(300); // ждём 0.3 сек
+                    await Task.Delay(300);
                 }
 
-
-                // ⭐ Теперь ShowWinMessage вызывается только когда ВСЕ игроки завершили
+                // ⭐ ПОКАЗЫВАЕМ СТАТИСТИКУ
                 var statsWindow = new NetworkStatsWindow(results);
                 statsWindow.Owner = this;
                 statsWindow.ShowDialog();
@@ -923,13 +944,13 @@ namespace NumericCrossword
                 {
                     allResultsText += $"{r.PlayerName}: {r.Score} очков, время {TimeSpan.FromSeconds(r.TimeSeconds):mm\\:ss}\n";
                 }
+
                 WinMessage msg2 = new WinMessage(allResultsText);
                 msg2.Owner = this;
                 msg2.ShowDialog();
 
                 return;
             }
-
 
 
 
@@ -1070,10 +1091,16 @@ namespace NumericCrossword
         {
             rnd = new Random(seed);
         }
-        private async void BtnOnline_Click(object sender, RoutedEventArgs e)
+        private void BtnOnline_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
+            }
+            catch { }
+            // StartServerHidden(); 
             GameListWindow win = new GameListWindow();
-            win.CurrentPlayer = CurrentPlayer;
+            win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
             win.CurrentDifficulty = currentDifficulty;
 
             win.Owner = this;
@@ -1081,32 +1108,22 @@ namespace NumericCrossword
 
             if (win.SelectedGameId != null)
             {
-                // ⭐ ПРИСОЕДИНЯЕМСЯ К ИГРЕ
-                var info = await NumericCrossword.Core.GameApi.JoinGame(
-                    win.SelectedGameId,
-                    CurrentPlayer.Name,
-                    currentDifficulty
-                );
+                // После закрытия окна выбора игры мы получаем ID выбранной игры
 
-                // ⭐ сохраняем количество игроков
-                CurrentTotalPlayers = info.Players.Count;
+                currentGameId = win.SelectedGameId;
 
-                // ⭐ сохраняем ID игры
-                currentGameId = info.GameId;
-
-                // ⭐ запускаем сетевую игру
+                // Запускаем сетевую игру, передавая gameId в метод
                 StartOnlineGame(currentGameId);
+
             }
+
         }
-
-
-
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
         // Здесь мы получаем полную информацию об игре с сервера,
         // инициализируем генератор кроссворда и запускаем сетевую партию
 
-        private async void StartOnlineGame(string gameId)
+        public async void StartOnlineGame(string gameId)
         {
             try
             {
