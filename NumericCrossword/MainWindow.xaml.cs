@@ -888,12 +888,6 @@ namespace NumericCrossword
             timer.Start();
         }
 
-
-
-
-
-
-
         // ⭐ Финальная версия ShowWinMessage
         private async void ShowWinMessage()
         {
@@ -925,9 +919,6 @@ namespace NumericCrossword
             msg.Owner = this;
             msg.ShowDialog();
         }
-
-
-
 
         private async Task FinishOnlineGame()
         {
@@ -1179,6 +1170,15 @@ namespace NumericCrossword
             }
 
         }
+
+        private void BtnChat_Click(object sender, RoutedEventArgs e)
+        {
+            var chat = new ChatWindow(CurrentPlayer.Name);
+            chat.Owner = this;
+            chat.Show();
+        }
+
+
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
         // Здесь мы получаем полную информацию об игре с сервера,

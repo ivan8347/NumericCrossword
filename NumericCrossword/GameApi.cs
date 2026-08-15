@@ -235,6 +235,7 @@ using System.Threading.Tasks;
 
 namespace NumericCrossword.Core
 {
+
     public class GameInfo
     {
         public string GameId { get; set; }
@@ -279,6 +280,10 @@ namespace NumericCrossword.Core
         {
             BaseAddress = new Uri("http://192.168.0.18:5270/"),
             Timeout = TimeSpan.FromSeconds(5)
+        };
+        private static readonly HttpClient client = new HttpClient
+        {
+            BaseAddress = new Uri("http://192.168.0.18:5270")
         };
 
         public static async Task<List<GameItem>> GetGames()
@@ -411,5 +416,33 @@ namespace NumericCrossword.Core
                 return "[]";
             }
         }
+
+        public static async Task SendChatMessage(string player, string text)
+        {
+            var msg = new
+            {
+                Player = player,
+                Text = text
+            };
+
+            await client.PostAsJsonAsync("/chat", msg);
+        }
+
+        public static async Task<List<ChatMessageDto>> GetChatMessages()
+        {
+            var response = await client.GetAsync("/chat");
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadFromJsonAsync<List<ChatMessageDto>>();
+        }
+
+        public class ChatMessageDto
+        {
+            public string Player { get; set; }
+            public string Text { get; set; }
+            public DateTime Time { get; set; }
+        }
+
     }
 }

@@ -84,6 +84,7 @@
                     Width="140" Height="40" 
                     Margin="5" Click="BtnOnline_Click"/>
 
+            <Button Content="Чат"  Width="140" Height="40"  Click="BtnChat_Click"/>
 
 
         </StackPanel>
