@@ -1177,7 +1177,7 @@ namespace NumericCrossword
             chat.Owner = this;
             chat.Show();
         }
-
+        
 
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
