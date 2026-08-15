@@ -846,6 +846,9 @@ namespace NumericCrossword
         // -----------------------------
         private void BtnNewGame_Click(object sender, RoutedEventArgs e)
         {
+            IsOnlineGame = false;
+            currentGameId = null;
+
             undoStack.Clear();
             cellUndoStack.Clear();
             currentGameId = null;
