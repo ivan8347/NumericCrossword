@@ -1258,7 +1258,7 @@ namespace NumericCrossword
 
         private readonly HttpClient _http = new HttpClient
         {
-            BaseAddress = new Uri("http://localhost:5270") // адрес твоего сервера
+            BaseAddress = new Uri("https://crosswordserver.onrender.com") // адрес твоего сервера
         };
 
     }

@@ -278,12 +278,12 @@ namespace NumericCrossword.Core
     {
         private static readonly HttpClient http = new HttpClient
         {
-            BaseAddress = new Uri("http://192.168.0.18:5270/"),
+            BaseAddress = new Uri("https://crosswordserver.onrender.com"),
             Timeout = TimeSpan.FromSeconds(5)
         };
         private static readonly HttpClient client = new HttpClient
         {
-            BaseAddress = new Uri("http://192.168.0.18:5270")
+            BaseAddress = new Uri("https://crosswordserver.onrender.com")
         };
 
         public static async Task<List<GameItem>> GetGames()
