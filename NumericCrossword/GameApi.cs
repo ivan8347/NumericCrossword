@@ -436,7 +436,7 @@ namespace NumericCrossword.Core
 
             return await response.Content.ReadFromJsonAsync<List<ChatMessageDto>>();
         }
-
+        
         public class ChatMessageDto
         {
             public string Player { get; set; }
