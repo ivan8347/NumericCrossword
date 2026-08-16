@@ -19,6 +19,8 @@ namespace NumericCrossword
         {
             InitializeComponent();
             LoadGames();
+            GamesList.SelectionChanged += GamesList_SelectionChanged;
+
         }
 
         // Загрузка списка игр
@@ -110,6 +112,17 @@ namespace NumericCrossword
             // Закрываем окно и возвращаем управление в MainWindow
             DialogResult = true;
             Close();
+        }
+        private void GamesList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            var item = GamesList.SelectedItem as GameItem;
+            if (item == null) return;
+
+            // ⭐ Автоматически подставляем сложность выбранной игры
+            CurrentDifficulty = item.Difficulty;
+
+            // ⭐ Если у тебя есть ComboBox сложности — обнови его
+           // DifficultyComboBox.SelectedItem = item.Difficulty;
         }
 
     }
