@@ -4,40 +4,38 @@ using NumericCrossword.Core;      // где лежит ScoreStorage
 using NumericCrossword.Models;   // где лежит ScoreRecord
 using System.Linq;
 using System;
-//using CrosswordServer.Models;
 
 namespace NumericCrossword
 {
     public partial class RatingWindow : Window
     {
         public RatingWindow()
-{
-    InitializeComponent();
-    LoadRating();
-}
-
-        private async void LoadRating()
         {
-            var scores = await GameApi.GetRating();
+            InitializeComponent();
 
-            var ordered = scores
-                .OrderByDescending(s => s.Score)
-                .ThenBy(s => s.TimeSeconds)
-                .ToList();
+            // Загружаем список рекордов
+            var scores = ScoreStorage.Load();
 
+            // На всякий случай отсортируем по времени (наименьшее — лучше)
+            var ordered = scores.OrderBy(s => s.Time).ToList();
+
+            // Заполняем ListBox
             ListScores.Items.Clear();
 
             int place = 1;
             foreach (var s in ordered)
             {
+               /* string medal =  place == 1 ? "🥇" :
+                                place == 2 ? "🥈" :
+                                place == 3 ? "🥉" : $"{place}.";*/
+
                 ListScores.Items.Add(
-                    $"{place}. {s.PlayerName} — {s.Score} очков — {s.TimeSeconds} сек — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
+                    $"{place}  - {s.Name} — {s.Score} очков - {s.Time:mm\\:ss} — {s.Difficulty} — {s.Date:dd.MM.yyyy}"
                 );
+
                 place++;
             }
         }
-
-
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {

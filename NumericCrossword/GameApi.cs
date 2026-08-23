@@ -232,7 +232,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using NumericCrossword.Models;
 
 namespace NumericCrossword.Core
 {
@@ -444,28 +443,6 @@ namespace NumericCrossword.Core
             public string Text { get; set; }
             public DateTime Time { get; set; }
         }
-        public class ScoreRecord
-        {
-            public string PlayerName { get; set; }
-            public int Score { get; set; }
-            public int TimeSeconds { get; set; }
-            public string Difficulty { get; set; }
-            public DateTime Date { get; set; }
-        }
-
-        public static async Task<List<ScoreRecord>> GetRating()
-        {
-            try
-            {
-                return await http.GetFromJsonAsync<List<ScoreRecord>>("rating")
-                       ?? new List<ScoreRecord>();
-            }
-            catch
-            {
-                return new List<ScoreRecord>();
-            }
-        }
-
 
     }
 }
