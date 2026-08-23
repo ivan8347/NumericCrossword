@@ -108,7 +108,7 @@ namespace NumericCrossword
             // и закрываем окно, чтобы MainWindow получил результат
 
             SelectedGameId = info.GameId;
-
+           // CurrentDifficulty = info.Difficulty;
             // Закрываем окно и возвращаем управление в MainWindow
             DialogResult = true;
             Close();

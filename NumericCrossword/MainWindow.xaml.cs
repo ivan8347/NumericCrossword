@@ -54,6 +54,8 @@ namespace NumericCrossword
         private DateTime serverStartTime;
         public static PlayerProfile CurrentPlayer;
 
+       // private string Difficulty CurrentDifficulty; // Или то имя enum, которое у тебя используется (например, GameDifficulty)
+            private string CurrentDifficulty;
 
 
 
@@ -660,12 +662,53 @@ namespace NumericCrossword
         // -----------------------------
         //  СКРЫТИЕ ЧИСЕЛ
         // -----------------------------
-        private void ApplyDifficulty(List<Formula> formulas)
-        {
-            int difficulty = DifficultyBox.SelectedIndex;
+        /* private void ApplyDifficulty(List<Formula> formulas)
+         {
+             int difficulty = DifficultyBox.SelectedIndex;
 
-            double hideChance = difficulty == 0 ? 0.05 :
-                                difficulty == 1 ? 0.05 : 0.80;
+             double hideChance = difficulty == 0 ? 0.05 :
+                                 difficulty == 1 ? 0.05 : 0.80;
+
+             foreach (var f in formulas)
+             {
+                 // случайно скрываем
+                 f.HideA = rnd.NextDouble() < hideChance;
+                 f.HideB = rnd.NextDouble() < hideChance;
+                 f.HideC = rnd.NextDouble() < hideChance;
+
+                 // ❗ запрещаем скрывать ВСЕ три числа
+                 if (f.HideA && f.HideB && f.HideC)
+                 {
+                     int leaveVisible = rnd.Next(3);
+                     if (leaveVisible == 0) f.HideA = false;
+                     else if (leaveVisible == 1) f.HideB = false;
+                     else f.HideC = false;
+                 }
+             }
+         }*/
+        private void ApplyDifficulty(List<Formula> formulas, string difficulty)
+        {
+            // 1. Конвертируем строку от сервера в индекс (0, 1, 2)
+            int index = 0; // По умолчанию "Лёгкий"
+
+            if (difficulty == "Средний")
+                index = 1;
+            else if (difficulty == "Сложный")
+                index = 2;
+
+            // Если сервер прислал что-то неожиданное, остаёмся на 0 (безопасный режим)
+
+            // 2. Вычисляем шанс скрытия на основе индекса
+            // Лёгкий (0): 5%
+            // Средний (1): 5% (оставил как у тебя, но проверь логику — обычно средний сложнее лёгкого)
+            // Сложный (2): 80%
+            double hideChance = index switch
+            {
+                0 => 0.05,
+                1 => 0.05, // ⚠️ Проверь: возможно, тут должно быть 0.40 или 0.50?
+                2 => 0.80,
+                _ => 0.05
+            };
 
             foreach (var f in formulas)
             {
@@ -881,7 +924,10 @@ namespace NumericCrossword
 
             CreateGrid(); // если нужно пересоздать разметку (обычно не требуется, если сетка уже создана)
             formulas = GenerateCrossword();
-            ApplyDifficulty(formulas);
+            // ApplyDifficulty(formulas);
+            // ✅ ТАК ПРАВИЛЬНО
+            ApplyDifficulty(formulas, CurrentDifficulty);
+
             DrawFormulas(formulas);
             CreateTilesFromFormulas(formulas);
 
@@ -1177,7 +1223,7 @@ namespace NumericCrossword
             chat.Owner = this;
             chat.Show();
         }
-        
+
 
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
@@ -1189,11 +1235,11 @@ namespace NumericCrossword
             MessageBox.Show("StartOnlineGame вызван");
 
             currentGameId = gameId;
-            IsOnlineGame = true;   // ← КРИТИЧЕСКИ ВАЖНО
+            IsOnlineGame = true;
 
             try
             {
-               //var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
+                // Важно: передаём только gameId и имя. Сложность НЕ передаём!
                 var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name);
 
                 if (info == null)
@@ -1201,9 +1247,13 @@ namespace NumericCrossword
                     MessageBox.Show("Ошибка: не удалось получить данные игры.");
                     return;
                 }
+
+                // Присваиваем строку из ответа сервера
+                CurrentDifficulty = info.Difficulty;
+
                 CurrentTotalPlayers = info.Players.Count;
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] В игре {gameId} всего игроков: {info.Players.Count}");
-
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Сложность игры (от сервера): {CurrentDifficulty}");
 
                 timer.Stop();
                 timerValue = TimeSpan.Zero;
@@ -1239,7 +1289,10 @@ namespace NumericCrossword
                 InitRandom(info.Seed);
 
                 formulas = GenerateCrossword();
-                ApplyDifficulty(formulas);
+
+                // Передаём строку в ApplyDifficulty
+                ApplyDifficulty(formulas, CurrentDifficulty);
+
                 DrawFormulas(formulas);
                 CreateTilesFromFormulas(formulas);
 
@@ -1252,6 +1305,9 @@ namespace NumericCrossword
                 MessageBox.Show($"Ошибка сетевой игры: {ex.Message}");
             }
         }
+
+
+
 
 
 
