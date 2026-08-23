@@ -93,8 +93,8 @@ namespace NumericCrossword
 
             // 2) Пытаемся подключиться к выбранной игре через сервер
             // JoinGame возвращает GameInfo или null, если ошибка
-            //GameInfo info = await GameApi.JoinGame(item.GameId, CurrentPlayer.Name, CurrentDifficul);
-            GameInfo info = await GameApi.JoinGame(item.GameId, CurrentPlayer.Name);
+            GameInfo info = await GameApi.JoinGame(item.GameId, CurrentPlayer.Name, CurrentDifficulty);
+            //GameInfo info = await GameApi.JoinGame(item.GameId, CurrentPlayer.Name);
 
 
             if (info == null)

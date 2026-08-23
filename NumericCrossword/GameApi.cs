@@ -314,11 +314,11 @@ namespace NumericCrossword.Core
             }
         }
 
-        public static async Task<GameInfo> JoinGame(string gameId, string playerName)
+        public static async Task<GameInfo> JoinGame(string gameId, string playerName,string difficulty)
         {
             try
             {
-                var body = new { gameId, playerName };
+                var body = new { gameId, playerName, difficulty };
                 var response = await http.PostAsJsonAsync("game/join", body);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<GameInfo>();
