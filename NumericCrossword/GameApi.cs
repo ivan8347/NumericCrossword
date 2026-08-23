@@ -451,6 +451,18 @@ namespace NumericCrossword.Core
             public string Text { get; set; }
             public DateTime Time { get; set; }
         }
+        public static async Task<List<ScoreRecord>> GetRating()
+        {
+            try
+            {
+                return await http.GetFromJsonAsync<List<ScoreRecord>>("rating")
+                       ?? new List<ScoreRecord>();
+            }
+            catch
+            {
+                return new List<ScoreRecord>();
+            }
+        }
 
     }
 }
