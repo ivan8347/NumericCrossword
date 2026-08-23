@@ -897,7 +897,7 @@ namespace NumericCrossword
             score = totalScore;
             ScoreText.Text = totalScore.ToString();
 
-            ScoreStorage.AddRecord(new ScoreRecord
+            ScoreStorage.AddRecord(new LocalScoreRecord
             {
                 Name = CurrentPlayer.Name,
                 Difficulty = currentDifficulty,

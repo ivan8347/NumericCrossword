@@ -11,16 +11,16 @@ namespace NumericCrossword.Core
         // Убираем прямое задание пути, используем метод для получения
         private static string FilePath => GetFilePath();
 
-        public static List<ScoreRecord> Load()
+        public static List<LocalScoreRecord> Load()
         {
             if (!File.Exists(FilePath))
-                return new List<ScoreRecord>();
+                return new List<LocalScoreRecord>();
 
             string json = File.ReadAllText(FilePath);
-            return JsonConvert.DeserializeObject<List<ScoreRecord>>(json) ?? new List<ScoreRecord>();
+            return JsonConvert.DeserializeObject<List<LocalScoreRecord>>(json) ?? new List<LocalScoreRecord>();
         }
 
-        public static void Save(List<ScoreRecord> scores)
+        public static void Save(List<LocalScoreRecord> scores)
         {
             // Создаём директорию, если её нет
             string directory = Path.GetDirectoryName(FilePath);
@@ -38,7 +38,7 @@ namespace NumericCrossword.Core
             File.WriteAllText(FilePath, json);
         }
 
-        public static void AddRecord(ScoreRecord record)
+        public static void AddRecord(LocalScoreRecord record)
         {
             var list = Load();
             list.Add(record);

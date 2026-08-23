@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NumericCrossword.Models
 {
-    public class ScoreRecord
+    public class LocalScoreRecord
     {
         public string Name { get; set; }
         public string Difficulty { get; set; }
