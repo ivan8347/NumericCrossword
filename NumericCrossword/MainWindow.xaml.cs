@@ -1193,8 +1193,8 @@ namespace NumericCrossword
 
             try
             {
-               var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
-                //var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name);
+               //var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
+                var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name);
 
                 if (info == null)
                 {
