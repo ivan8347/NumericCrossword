@@ -11,7 +11,6 @@ using NumericCrossword.Models;
 using NumericCrossword.Core;
 using System.Diagnostics;
 using System.Net.Http;
-using static NumericCrossword.Core.GameApi;
 using System.Threading.Tasks;
 
 
@@ -897,14 +896,30 @@ namespace NumericCrossword
             score = totalScore;
             ScoreText.Text = totalScore.ToString();
 
-            ScoreStorage.AddRecord(new LocalScoreRecord
+            // Стало (правильно):
+            if (CurrentPlayer != null)
             {
-                Name = CurrentPlayer.Name,
-                Difficulty = currentDifficulty,
-                Time = timerValue,
-                Score = totalScore,
-                Date = DateTime.Now
-            });
+                var newRecord = new LocalScoreRecord(
+                    playerName: CurrentPlayer.Name,
+                    difficulty: currentDifficulty,
+                    time: timerValue,
+                    score: totalScore,
+                    date: DateTime.Now
+                );
+
+                ScoreStorage.AddRecord(newRecord);
+            }
+
+
+
+            /* ScoreStorage.AddRecord(new LocalScoreRecord
+             {
+                 Name = CurrentPlayer.Name,
+                 Difficulty = currentDifficulty,
+                 Time = timerValue,
+                 Score = totalScore,
+                 Date = DateTime.Now
+             });*/
 
             var players = PlayerStorage.Load();
             var p = players.FirstOrDefault(x => x.Name == CurrentPlayer.Name);

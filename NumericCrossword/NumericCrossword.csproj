@@ -143,9 +143,9 @@
     </Compile>
     <Compile Include="Models\Formula.cs" />
     <Compile Include="Models\FormulaSlot.cs" />
+    <Compile Include="Models\LocalScoreRecord.cs" />
     <Compile Include="Models\PlayerProfile.cs" />
     <Compile Include="Models\PlayerStorage.cs" />
-    <Compile Include="Models\LocalScoreRecord.cs" />
     <Compile Include="Models\ScoreStorage.cs" />
     <Compile Include="Models\TemplateFile.cs" />
     <Compile Include="Models\TemplateJson.cs" />

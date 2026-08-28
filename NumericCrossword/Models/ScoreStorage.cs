@@ -8,6 +8,16 @@ namespace NumericCrossword.Core
 {
     public static class ScoreStorage
     {
+        public class ScoreRecord
+        {
+            public string PlayerName { get; set; }
+            public int Score { get; set; }
+            public int TimeSeconds { get; set; }
+            public string Difficulty { get; set; }
+            public DateTime Date { get; set; }
+        }
+
+       
         // Убираем прямое задание пути, используем метод для получения
         private static string FilePath => GetFilePath();
 
