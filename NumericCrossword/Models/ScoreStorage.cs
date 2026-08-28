@@ -15,9 +15,12 @@ namespace NumericCrossword.Core
             public int TimeSeconds { get; set; }
             public string Difficulty { get; set; }
             public DateTime Date { get; set; }
+
+            
         }
 
-       
+
+
         // Убираем прямое задание пути, используем метод для получения
         private static string FilePath => GetFilePath();
 

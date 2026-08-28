@@ -14,7 +14,7 @@ namespace NumericCrossword
         public int Place { get; set; }
         public string PlayerName { get; set; }
         public int Score { get; set; }
-        public int TimeSeconds { get; set; }
+        public int TimeFormatted { get; set; }
         public string Difficulty { get; set; }
         public DateTime Date { get; set; }
     }
@@ -27,6 +27,7 @@ namespace NumericCrossword
         public int Score { get; set; }
         public string TimeFormatted { get; set; } // "01:23"
         public string Difficulty { get; set; }
+        public DateTime Date { get; set; }
     }
 
     public partial class RatingWindow : Window
@@ -54,7 +55,7 @@ namespace NumericCrossword
                         Place = index + 1,
                         PlayerName = s.PlayerName,
                         Score = s.Score,
-                        TimeSeconds = s.TimeSeconds,
+                        TimeFormatted = s.TimeSeconds,
                         Difficulty = s.Difficulty,
                         Date = s.Date
                     })
@@ -82,7 +83,8 @@ namespace NumericCrossword
                         PlayerName = s.PlayerName,
                         Score = s.Score,
                         TimeFormatted = s.Time.ToString(@"mm\:ss"), // "01:23"
-                        Difficulty = s.Difficulty
+                        Difficulty = s.Difficulty,
+                        Date = s.Date
                     })
                     .ToList();
 

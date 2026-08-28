@@ -38,27 +38,28 @@
                        Margin="0 0 0 20"/>
 
             <!-- Сетевой рейтинг -->
-            <TextBlock Grid.Row="1" Text="Сетевой рейтинг (сервер)"
+            <TextBlock Grid.Row="1" Text="Сетевой рейтинг"
                        FontSize="20" FontWeight="SemiBold"
-                       Foreground="#AAAAAA" Margin="0 0 0 10"/>
+                       Foreground="#AAAAAA" HorizontalAlignment="Center" 
+                       Margin="0 0 0 20"/>
 
             <!-- Подписи колонок (сетевой) -->
             <Grid Grid.Row="2" Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="120"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="#" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="1" Text="Игрок" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="2" Text="Очки" Foreground="#CCCCCC" HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="3" Text="Время" Foreground="#CCCCCC" HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="4" Text="Сложность" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="5" Text="Дата" Foreground="#CCCCCC"/>
+                <TextBlock Grid.Column="1" Text="Игрок" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Очки" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="Время" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="Сложность" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="Дата" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
             </Grid>
 
             <!-- Сетевой список -->
@@ -71,19 +72,19 @@
                         <Grid Margin="0 5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="120"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0" Text="{Binding Place}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding PlayerName}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Score}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="{Binding TimeSeconds}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Difficulty}" VerticalAlignment="Center" Foreground="#AAAAAA"/>
-                            <TextBlock Grid.Column="5" Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" VerticalAlignment="Center" Foreground="#AAAAAA"/>
+                            <TextBlock Grid.Column="1" Text="{Binding PlayerName}" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Score}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding TimeFormatted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Difficulty}" HorizontalAlignment="Center"  VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="5" Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" HorizontalAlignment="Center"  VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -93,25 +94,28 @@
             <Separator Grid.Row="4" Margin="0 15" Background="#333333"/>
 
             <!-- Локальный рейтинг -->
-            <TextBlock Grid.Row="5" Text="Локальный топ‑5 (диск)"
+            <TextBlock Grid.Row="5" Text="Локальный рейтинг"
                        FontSize="20" FontWeight="SemiBold"
-                       Foreground="#AAAAAA" Margin="0 0 0 10"/>
+                       Foreground="#AAAAAA"  HorizontalAlignment="Center"
+                       Margin="0 0 0 20"/>
 
             <!-- Подписи колонок (локальный) -->
             <Grid Grid.Row="6" Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="#" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="1" Text="Игрок" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="2" Text="Очки" Foreground="#CCCCCC" HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="3" Text="Время" Foreground="#CCCCCC"/>
-                <TextBlock Grid.Column="4" Text="Сложность" Foreground="#CCCCCC"/>
+                <TextBlock Grid.Column="1" Text="Игрок" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Очки" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="Время" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="Сложность" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text= "Дата"    Foreground="#CCCCCC" HorizontalAlignment="Center"/>
             </Grid>
 
             <!-- Локальный список -->
@@ -124,17 +128,19 @@
                         <Grid Margin="0 5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="120"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0" Text="{Binding Place}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding PlayerName}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Score}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="{Binding TimeFormatted}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Difficulty}" VerticalAlignment="Center" Foreground="#AAAAAA"/>
+                            <TextBlock Grid.Column="1" Text="{Binding PlayerName}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{Binding Score}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding TimeFormatted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Difficulty}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="5" Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -142,14 +148,14 @@
 
             <!-- Кнопки -->
             <StackPanel Grid.Row="8" Orientation="Horizontal"
-                        HorizontalAlignment="Center" Margin="0 20 0 0">
+                        HorizontalAlignment="Center" Margin="0 20 10 0">
                 <Button Content="OK" Width="140" Height="40"
                         Margin="0 0 10 0"
                         Click="Ok_Click"
                         Background="#AA000000" Foreground="White"
                         BorderThickness="0"/>
 
-                <Button x:Name="BtnClearLocal" Content="Очистить локальный кэш"
+                <Button x:Name="BtnClearLocal" Content="Очистить"
                         Width="160" Height="40"
                         Click="BtnClearLocal_Click"
                         Background="#AAFF4444" Foreground="White"
