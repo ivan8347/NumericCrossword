@@ -14,7 +14,7 @@ namespace NumericCrossword
         public int Place { get; set; }
         public string PlayerName { get; set; }
         public int Score { get; set; }
-        public int TimeFormatted { get; set; }
+        public string TimeFormatted { get; set; }
         public string Difficulty { get; set; }
         public DateTime Date { get; set; }
     }
@@ -55,7 +55,8 @@ namespace NumericCrossword
                         Place = index + 1,
                         PlayerName = s.PlayerName,
                         Score = s.Score,
-                        TimeFormatted = s.TimeSeconds,
+                        TimeFormatted = $"{s.TimeSeconds / 60:D2}:{s.TimeSeconds % 60:D2}",
+                       // TimeFormatted = s.TimeSeconds,
                         Difficulty = s.Difficulty,
                         Date = s.Date
                     })
