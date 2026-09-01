@@ -845,12 +845,16 @@ namespace NumericCrossword
         // -----------------------------
         private void BtnNewGame_Click(object sender, RoutedEventArgs e)
         {
+            // ⭐ Выходим из сетевого режима
             IsOnlineGame = false;
+
+            // ⭐ Включаем выбор сложности для следующей игры (локальной или сетевой)
+            DifficultyBox.IsEnabled = true;
+
             currentGameId = null;
 
             undoStack.Clear();
             cellUndoStack.Clear();
-            currentGameId = null;
 
             timer.Stop();
 
@@ -863,7 +867,7 @@ namespace NumericCrossword
 
             serverStartTime = DateTime.UtcNow;
 
-            // --- ДОБАВИТЬ: ПОЛНАЯ ОЧИСТКА СЕТКИ ---
+            // Полная очистка сетки
             for (int r = 0; r < Rows; r++)
             {
                 for (int c = 0; c < Cols; c++)
@@ -876,9 +880,8 @@ namespace NumericCrossword
                     cell.BorderThickness = new Thickness(1);
                 }
             }
-            // ---------------------------------------
 
-            CreateGrid(); // если нужно пересоздать разметку (обычно не требуется, если сетка уже создана)
+            CreateGrid();
             formulas = GenerateCrossword();
             ApplyDifficulty(formulas);
             DrawFormulas(formulas);
@@ -886,6 +889,7 @@ namespace NumericCrossword
 
             timer.Start();
         }
+
 
         // ⭐ Финальная версия ShowWinMessage
         private async void ShowWinMessage()
