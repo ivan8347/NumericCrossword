@@ -1092,13 +1092,18 @@ namespace NumericCrossword
             win.ShowDialog();
         }
 
-        private void DifficultyBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void DifficultyBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // ⭐ В сетевой игре сложность менять нельзя
+            if (IsOnlineGame)
+                return;
+
             if (DifficultyBox.SelectedItem is ComboBoxItem item)
             {
                 currentDifficulty = item.Content.ToString();
             }
         }
+
         private void BtnSelectPlayer_Click(object sender, RoutedEventArgs e)
         {
             currentGameId = null;
@@ -1168,7 +1173,7 @@ namespace NumericCrossword
             // StartServerHidden(); 
             GameListWindow win = new GameListWindow();
             win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
-            win.CurrentDifficulty = currentDifficulty;
+           // win.CurrentDifficulty = currentDifficulty;
 
             win.Owner = this;
             win.ShowDialog();
@@ -1176,6 +1181,7 @@ namespace NumericCrossword
             if (win.SelectedGameId != null)
             {
                 // После закрытия окна выбора игры мы получаем ID выбранной игры
+                DifficultyBox.IsEnabled = false;
 
                 currentGameId = win.SelectedGameId;
 
@@ -1215,6 +1221,7 @@ namespace NumericCrossword
                     MessageBox.Show("Ошибка: не удалось получить данные игры.");
                     return;
                 }
+                DifficultyBox.IsEnabled = false;
 
                 // ⭐ ВАЖНО: сложность приходит с сервера
                 currentDifficulty = info.Difficulty;
