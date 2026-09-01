@@ -979,6 +979,10 @@ namespace NumericCrossword
             var finalResults = await GameApi.GetResults(currentGameId);
             if (finalResults != null && finalResults.Count > 0)
                 ShowWinMessage(finalResults);
+
+            DifficultyBox.IsEnabled = true;
+            IsOnlineGame = false;
+
         }
 
 
