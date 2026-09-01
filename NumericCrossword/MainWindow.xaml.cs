@@ -1192,7 +1192,7 @@ namespace NumericCrossword
             chat.Owner = this;
             chat.Show();
         }
-        
+
 
         // Запуск сетевой игры после выбора или создания
         // Этот метод вызывается после того, как GameListWindow вернул GameId
@@ -1204,11 +1204,10 @@ namespace NumericCrossword
             MessageBox.Show("StartOnlineGame вызван");
 
             currentGameId = gameId;
-            IsOnlineGame = true;   // ← КРИТИЧЕСКИ ВАЖНО
+            IsOnlineGame = true;
 
             try
             {
-               // var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name, currentDifficulty);
                 var info = await GameApi.JoinGame(gameId, CurrentPlayer.Name);
 
                 if (info == null)
@@ -1216,16 +1215,20 @@ namespace NumericCrossword
                     MessageBox.Show("Ошибка: не удалось получить данные игры.");
                     return;
                 }
+
+                // ⭐ ВАЖНО: сложность приходит с сервера
+                currentDifficulty = info.Difficulty;
+
                 CurrentTotalPlayers = info.Players.Count;
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] В игре {gameId} всего игроков: {info.Players.Count}");
 
-
+                // Сброс таймера
                 timer.Stop();
                 timerValue = TimeSpan.Zero;
-
                 if (TimerText != null)
                     TimerText.Text = "00:00";
 
+                // Очистка поля
                 TilesPanel.Children.Clear();
                 undoStack.Clear();
                 cellUndoStack.Clear();
@@ -1251,10 +1254,14 @@ namespace NumericCrossword
                     }
                 }
 
+                // ⭐ Генерация по серверному seed
                 InitRandom(info.Seed);
 
                 formulas = GenerateCrossword();
+
+                // ⭐ Применяем сложность сервера
                 ApplyDifficulty(formulas);
+
                 DrawFormulas(formulas);
                 CreateTilesFromFormulas(formulas);
 

@@ -103,7 +103,7 @@ namespace NumericCrossword
                 MessageBox.Show("Не удалось подключиться к игре");
                 return;
             }
-
+            CurrentDifficulty = info.Difficulty;
             // 3) Если подключение успешно — сохраняем ID игры
             // и закрываем окно, чтобы MainWindow получил результат
 

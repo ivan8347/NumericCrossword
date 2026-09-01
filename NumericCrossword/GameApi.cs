@@ -109,9 +109,15 @@ namespace NumericCrossword.Core
         {
             try
             {
-                var body = new { gameId, playerName };
+                var body = new
+                {
+                    gameId,
+                    playerName
+                };
+
                 var response = await http.PostAsJsonAsync("game/join", body);
                 response.EnsureSuccessStatusCode();
+
                 return await response.Content.ReadFromJsonAsync<GameInfo>();
             }
             catch
@@ -119,6 +125,7 @@ namespace NumericCrossword.Core
                 return null;
             }
         }
+
 
         public static async Task<GameInfo> GetGameInfo(string gameId)
         {
