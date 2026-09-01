@@ -1165,32 +1165,26 @@ namespace NumericCrossword
             isGameFinished = false;
             AllowMoves = true;
             timerValue = TimeSpan.Zero;
-            try
-            {
-                // System.Diagnostics.Process.Start("U:\\Users\\kit\\source\\repos\\CrosswordServer\\CrosswordServer\\bin\\Debug\\net8.0\\CrosswordServer.exe");
-            }
-            catch { }
-            // StartServerHidden(); 
+
             GameListWindow win = new GameListWindow();
-            win.CurrentPlayer = CurrentPlayer;   // ← передаём игрока
-           // win.CurrentDifficulty = currentDifficulty;
+            win.CurrentPlayer = CurrentPlayer;
+
+            // ⭐ Передаём сложность ТОЛЬКО для создания игры
+            win.CurrentDifficulty = currentDifficulty;
 
             win.Owner = this;
             win.ShowDialog();
 
             if (win.SelectedGameId != null)
             {
-                // После закрытия окна выбора игры мы получаем ID выбранной игры
                 DifficultyBox.IsEnabled = false;
 
                 currentGameId = win.SelectedGameId;
 
-                // Запускаем сетевую игру, передавая gameId в метод
                 StartOnlineGame(currentGameId);
-
             }
-
         }
+
 
         private void BtnChat_Click(object sender, RoutedEventArgs e)
         {
