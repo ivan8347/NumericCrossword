@@ -5,39 +5,39 @@
 
         Title="Сетевые игры"
         WindowStartupLocation="CenterScreen"
-        Height="450" Width="600"
+        Height="450" Width="700"
         ResizeMode="NoResize"
         Background="#FFF2F2F2">
-	<Window.Resources>
-		<local:PlayersConverter x:Key="PlayersConverter"/>
-	</Window.Resources>
+    <Window.Resources>
+        <local:PlayersConverter x:Key="PlayersConverter"/>
+    </Window.Resources>
 
 
 
-	<Grid Margin="10">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-		<TextBlock Text="Доступные игры"
+        <TextBlock Text="Доступные игры"
                    FontSize="22"
                    FontWeight="Bold"
                    HorizontalAlignment="Center"
                    Margin="0 0 0 10"/>
 
-		<ListBox x:Name="GamesList"
+        <ListBox x:Name="GamesList"
          Grid.Row="1"
          FontSize="18"
          BorderBrush="#888"
          BorderThickness="1"
          Background="White">
 
-			<!-- Шаблон отображения GameItem -->
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<TextBlock FontSize="18" Margin="5">
+            <!-- Шаблон отображения GameItem -->
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock FontSize="18" Margin="5">
 						<Run Text="Создал: "/>
 						<Run Text="{Binding Creator}" FontWeight="Bold"/>
 
@@ -48,33 +48,46 @@
 						<Run Text=" — присоединились: "/>
 
 						<Run Text="{Binding Players, Converter={StaticResource PlayersConverter}}"/>
-					</TextBlock>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
 
-		</ListBox>
+        </ListBox>
 
 
 
-		<StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Margin="0 10 0 0">
 
-			<Button Content="Обновить"
+            <Button Content="Обновить"
                     Width="120" Height="40"
                     Margin="5"
                     Click="BtnRefresh_Click"/>
 
-			<Button Content="Создать игру"
+            <Button Content="Создать игру"
                     Width="150" Height="40"
                     Margin="5"
                     Click="BtnCreate_Click"/>
 
-			<Button Content="Присоединиться"
+            <Button Content="Присоединиться"
                     Width="150" Height="40"
                     Margin="5"
                     Click="BtnJoin_Click"/>
-		</StackPanel>
-	</Grid>
+
+            <ComboBox x:Name="DifficultySelector"
+                 Width="150" Height="40" Margin="5"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 SelectionChanged="DifficultySelector_SelectionChanged">
+
+                <ComboBoxItem Content="Лёгкий" IsSelected="True"/>
+                <ComboBoxItem Content="Средний"/>
+                <ComboBoxItem Content="Сложный"/>
+            </ComboBox>
+
+
+        </StackPanel>
+    </Grid>
 </Window>

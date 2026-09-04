@@ -849,7 +849,7 @@ namespace NumericCrossword
             IsOnlineGame = false;
 
             // ⭐ Включаем выбор сложности для следующей игры (локальной или сетевой)
-            DifficultyBox.IsEnabled = true;
+          //  DifficultyBox.IsEnabled = true;
 
             currentGameId = null;
 
@@ -980,8 +980,8 @@ namespace NumericCrossword
             if (finalResults != null && finalResults.Count > 0)
                 ShowWinMessage(finalResults);
 
-            DifficultyBox.IsEnabled = true;
-            IsOnlineGame = false;
+           // DifficultyBox.IsEnabled = true;
+           // IsOnlineGame = false;
 
         }
 
@@ -1106,10 +1106,10 @@ namespace NumericCrossword
             if (IsOnlineGame)
                 return;
 
-            if (DifficultyBox.SelectedItem is ComboBoxItem item)
-            {
-                currentDifficulty = item.Content.ToString();
-            }
+           // if (DifficultyBox.SelectedItem is ComboBoxItem item)
+           // {
+           //     currentDifficulty = item.Content.ToString();
+           // }
         }
 
         private void BtnSelectPlayer_Click(object sender, RoutedEventArgs e)

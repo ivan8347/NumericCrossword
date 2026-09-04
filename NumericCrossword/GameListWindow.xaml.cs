@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Controls;
 using NumericCrossword.Core;
 using NumericCrossword.Models;
 
@@ -39,43 +40,65 @@ namespace NumericCrossword
         }
 
         // Кнопка "Обновить"
-        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            LoadGames();
-        }
+         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+          {
+              LoadGames();
+          }
 
-        // Кнопка "Создать игру"
+          // Кнопка "Создать игру"
+        /*  private async void BtnCreate_Click(object sender, RoutedEventArgs e)
+          {
+              try
+              {
+                  // Создаём игру
+                 // var difficulty = CurrentDifficulty; // Лёгкий / Средний / Сложный
+                  var info = await GameApi.CreateGame(CurrentPlayer.Name, CurrentDifficulty);
+
+                  //var info = await GameApi.CreateGame(CurrentPlayer.Name, "Лёгкий");
+
+
+                  if (info != null)
+                  {
+                      SelectedGameId = info.GameId;
+                      DialogResult = true;
+                      Close();
+                  }
+                  else
+                  {
+                      MessageBox.Show("Не удалось создать игру");
+                  }
+              }
+              catch (Exception ex)
+              {
+                  MessageBox.Show("Ошибка создания игры: " + ex.Message);
+              }
+              MessageBox.Show(await GameApi.RawGamesJson());
+
+          }*/
+
         private async void BtnCreate_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (DifficultySelector.SelectedItem is ComboBoxItem item)
+                CurrentDifficulty = item.Content.ToString();
+            else
             {
-                // Создаём игру
-               // var difficulty = CurrentDifficulty; // Лёгкий / Средний / Сложный
-                var info = await GameApi.CreateGame(CurrentPlayer.Name, CurrentDifficulty);
-
-                //var info = await GameApi.CreateGame(CurrentPlayer.Name, "Лёгкий");
-
-
-                if (info != null)
-                {
-                    SelectedGameId = info.GameId;
-                    DialogResult = true;
-                    Close();
-                }
-                else
-                {
-                    MessageBox.Show("Не удалось создать игру");
-                }
+                MessageBox.Show("Выберите сложность");
+                return;
             }
-            catch (Exception ex)
+
+            var info = await GameApi.CreateGame(CurrentPlayer.Name, CurrentDifficulty);
+
+            if (info != null)
             {
-                MessageBox.Show("Ошибка создания игры: " + ex.Message);
+                SelectedGameId = info.GameId;
+                DialogResult = true;
+                Close();
             }
-            MessageBox.Show(await GameApi.RawGamesJson());
-
+            else
+            {
+                MessageBox.Show("Не удалось создать игру");
+            }
         }
-
-        // Кнопка "Присоединиться"
 
         // Вызывается, когда игрок выбирает игру из списка и нажимает кнопку
         private async void BtnJoin_Click(object sender, RoutedEventArgs e)
@@ -123,6 +146,13 @@ namespace NumericCrossword
 
             // ⭐ Если у тебя есть ComboBox сложности — обнови его
            // DifficultyComboBox.SelectedItem = item.Difficulty;
+        }
+        private void DifficultySelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DifficultySelector.SelectedItem is ComboBoxItem item)
+            {
+                CurrentDifficulty = item.Content.ToString();
+            }
         }
 
     }
