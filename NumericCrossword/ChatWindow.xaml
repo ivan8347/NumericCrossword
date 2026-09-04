@@ -21,6 +21,35 @@
                 <TextBox x:Name="ChatInput" Width="300" Margin="0,5,5,0"/>
                 <Button Content="Отправить" Width="80" Click="Send_Click"/>
             </StackPanel>
-        </Grid>
+            
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            
+            <TextBox x:Name="ChatInputBox" Width="260" Margin="0,5,5,0"/>
+
+            <!-- Кнопка смайликов -->
+            <Button x:Name="EmojiButton"
+            Content="😊"
+            Width="40"
+            Margin="0,5,5,0"
+            Click="EmojiButton_Click"/>
+
+            <Button Content="Отправить" Width="80" Click="Send_Click"/>
+        </StackPanel>
+            
+        <WrapPanel x:Name="EmojiPanel"
+           Grid.Row="1"
+           Visibility="Collapsed"
+           Margin="0,50,0,0">
+
+            <Button Content="😀" Click="Emoji_Click"/>
+            <Button Content="😂" Click="Emoji_Click"/>
+            <Button Content="😍" Click="Emoji_Click"/>
+            <Button Content="😎" Click="Emoji_Click"/>
+            <Button Content="👍" Click="Emoji_Click"/>
+            <Button Content="🔥" Click="Emoji_Click"/>
+            <Button Content="❤️" Click="Emoji_Click"/>
+        </WrapPanel>
+
+    </Grid>
     
 </Window>

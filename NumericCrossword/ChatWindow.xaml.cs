@@ -54,6 +54,28 @@ namespace NumericCrossword
             await GameApi.SendChatMessage(playerName, ChatInput.Text);
             ChatInput.Text = "";
         }
+        private void EmojiButton_Click(object sender, RoutedEventArgs e)
+        {
+            EmojiPanel.Visibility =
+                EmojiPanel.Visibility == Visibility.Visible
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+        }
+        private void Emoji_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ChatInput.Text += btn.Content.ToString();
+                ChatInput.Focus();
+                ChatInput.CaretIndex = ChatInput.Text.Length;
+            }
+        }
+        public void AddMessage(string user, string text)
+        {
+            ChatList.Items.Add($"{user}: {text}");
+            ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
+        }
+
     }
 
 }

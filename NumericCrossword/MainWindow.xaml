@@ -84,7 +84,11 @@
                     Width="140" Height="40" 
                     Margin="5" Click="BtnOnline_Click"/>
 
-            <Button Content="Чат"  Width="140" Height="40"  Click="BtnChat_Click"/>
+            <Button x:Name="BtnChat"
+        Content="Чат"
+        Width="100"
+        Click="BtnChat_Click"/>
+
 
 
         </StackPanel>

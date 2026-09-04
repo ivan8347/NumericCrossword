@@ -53,6 +53,10 @@ namespace NumericCrossword
         private DateTime serverStartTime;
         public static PlayerProfile CurrentPlayer;
 
+        private ChatWindow chatWindow;
+        private bool hasNewChatMessage = false;
+        private DispatcherTimer chatNotifyTimer = new DispatcherTimer();
+
 
 
 
@@ -1196,10 +1200,18 @@ namespace NumericCrossword
 
         private void BtnChat_Click(object sender, RoutedEventArgs e)
         {
-            var chat = new ChatWindow(CurrentPlayer.Name);
-            chat.Owner = this;
-            chat.Show();
+            hasNewChatMessage = false;
+            chatNotifyTimer.Stop();
+            BtnChat.Background = Brushes.LightPink;
+
+            if (chatWindow == null)
+                chatWindow = new ChatWindow(CurrentPlayer.Name);
+
+            chatWindow.Owner = this;
+            chatWindow.Show();
+            chatWindow.Focus();
         }
+
 
 
         // Запуск сетевой игры после выбора или создания
@@ -1281,6 +1293,36 @@ namespace NumericCrossword
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка сетевой игры: {ex.Message}");
+            }
+        }
+
+
+        private void StartChatNotification()
+        {
+            chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
+            chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
+            chatNotifyTimer.Start();
+        }
+
+        private void ChatNotifyTimer_Tick(object sender, EventArgs e)
+        {
+            if (hasNewChatMessage)
+            {
+                BtnChat.Background = BtnChat.Background == Brushes.Yellow
+                    ? Brushes.LightPink
+                    : Brushes.Yellow;
+            }
+        }
+
+        private void OnChatMessageReceived(string user, string text)
+        {
+            if (chatWindow != null)
+                chatWindow.AddMessage(user, text);
+
+            if (chatWindow == null || !chatWindow.IsVisible)
+            {
+                hasNewChatMessage = true;
+                StartChatNotification();
             }
         }
 

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericCrossword", "Numeric
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordServer", "..\CrosswordServer\CrosswordServer\CrosswordServer.csproj", "{0CF9E37B-F47B-475C-818E-F5909FC41C37}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{B4452F88-BF56-4CB7-8760-9F4D4A7FCE96}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{B7A11423-4D60-4E50-A3F6-2E8D930E8D0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,8 +23,8 @@ Global
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B4452F88-BF56-4CB7-8760-9F4D4A7FCE96}.Debug|Any CPU.ActiveCfg = Debug
-		{B4452F88-BF56-4CB7-8760-9F4D4A7FCE96}.Release|Any CPU.ActiveCfg = Release
+		{B7A11423-4D60-4E50-A3F6-2E8D930E8D0E}.Debug|Any CPU.ActiveCfg = Debug
+		{B7A11423-4D60-4E50-A3F6-2E8D930E8D0E}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
