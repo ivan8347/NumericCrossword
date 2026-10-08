@@ -59,7 +59,6 @@ namespace NumericCrossword
 
 
 
-
         private Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> cellUndoStack
             = new Stack<(int, int, string, string, bool)>();
 
@@ -1204,14 +1203,47 @@ namespace NumericCrossword
             chatNotifyTimer.Stop();
             BtnChat.Background = Brushes.LightPink;
 
-            if (chatWindow == null)
+            if (chatWindow == null || !chatWindow.IsLoaded)
+            {
                 chatWindow = new ChatWindow(CurrentPlayer.Name);
+                chatWindow.Owner = this;
+                chatWindow.Closed += (s, args) => chatWindow = null;
+                chatWindow.Show();
+                return;
+            }
 
-            chatWindow.Owner = this;
             chatWindow.Show();
             chatWindow.Focus();
         }
 
+        private void OnChatMessageReceived(string user, string text)
+        {
+            if (chatWindow != null && chatWindow.IsLoaded)
+                chatWindow.AddMessage(user, text);
+
+            if (chatWindow == null || !chatWindow.IsVisible)
+            {
+                hasNewChatMessage = true;
+                StartChatNotification();
+            }
+        }
+
+        private void StartChatNotification()
+        {
+            chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
+            chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
+            chatNotifyTimer.Start();
+        }
+
+        private void ChatNotifyTimer_Tick(object sender, EventArgs e)
+        {
+            if (hasNewChatMessage)
+            {
+                BtnChat.Background = BtnChat.Background == Brushes.Yellow
+                    ? Brushes.LightPink
+                    : Brushes.Yellow;
+            }
+        }
 
 
         // Запуск сетевой игры после выбора или создания
@@ -1293,36 +1325,6 @@ namespace NumericCrossword
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка сетевой игры: {ex.Message}");
-            }
-        }
-
-
-        private void StartChatNotification()
-        {
-            chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
-            chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
-            chatNotifyTimer.Start();
-        }
-
-        private void ChatNotifyTimer_Tick(object sender, EventArgs e)
-        {
-            if (hasNewChatMessage)
-            {
-                BtnChat.Background = BtnChat.Background == Brushes.Yellow
-                    ? Brushes.LightPink
-                    : Brushes.Yellow;
-            }
-        }
-
-        private void OnChatMessageReceived(string user, string text)
-        {
-            if (chatWindow != null)
-                chatWindow.AddMessage(user, text);
-
-            if (chatWindow == null || !chatWindow.IsVisible)
-            {
-                hasNewChatMessage = true;
-                StartChatNotification();
             }
         }
 

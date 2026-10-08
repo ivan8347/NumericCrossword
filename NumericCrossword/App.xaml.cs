@@ -12,5 +12,6 @@ namespace NumericCrossword
     /// </summary>
     public partial class App : Application
     {
+
     }
 }

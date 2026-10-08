@@ -1,24 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NumericCrossword.Core;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using NumericCrossword.Core;
 using System.Windows.Threading;
 
 namespace NumericCrossword
 {
-    /// <summary>
-    /// Interaction logic for ChatWindow.xaml
-    /// </summary>
     public partial class ChatWindow : Window
     {
         private string playerName;
@@ -54,6 +42,23 @@ namespace NumericCrossword
             await GameApi.SendChatMessage(playerName, ChatInput.Text);
             ChatInput.Text = "";
         }
+
+        public void AddMessage(string user, string text)
+        {
+            ChatList.Items.Add($"{user}: {text}");
+            ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
+        }
+
+        private void Emoji_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                ChatInput.Text += btn.Content.ToString();
+                ChatInput.CaretIndex = ChatInput.Text.Length;
+                ChatInput.Focus();
+            }
+        }
+
         private void EmojiButton_Click(object sender, RoutedEventArgs e)
         {
             EmojiPanel.Visibility =
@@ -61,21 +66,5 @@ namespace NumericCrossword
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         }
-        private void Emoji_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn)
-            {
-                ChatInput.Text += btn.Content.ToString();
-                ChatInput.Focus();
-                ChatInput.CaretIndex = ChatInput.Text.Length;
-            }
-        }
-        public void AddMessage(string user, string text)
-        {
-            ChatList.Items.Add($"{user}: {text}");
-            ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
-        }
-
     }
-
 }
