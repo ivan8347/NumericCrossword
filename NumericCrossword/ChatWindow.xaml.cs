@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -65,6 +66,14 @@ namespace NumericCrossword
                 EmojiPanel.Visibility == Visibility.Visible
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+        }
+        private void ChatInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Send_Click(sender, e);
+                e.Handled = true;
+            }
         }
     }
 }
