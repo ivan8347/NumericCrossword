@@ -214,10 +214,12 @@ namespace NumericCrossword.Core
 
         public static async Task SendChatMessage(string player, string text)
         {
+            var Time = DateTime.UtcNow;
             var msg = new
             {
                 Player = player,
-                Text = text
+                Text = text,
+               
             };
 
             try

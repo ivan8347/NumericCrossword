@@ -9,23 +9,28 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-       
+
 
         <!-- Список сообщений -->
-        <ListBox x:Name="ChatList" Grid.Row="0" Background="White" BorderThickness="0" Padding="5">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <!-- TextOptions.TextFormattingMode="Display" - это ключ к цветным эмодзи в WPF -->
-                    <TextBlock 
-                Text="{Binding}" 
-                FontFamily="Segoe UI Emoji" 
-                FontSize="16" 
-                TextWrapping="Wrap"
-                TextOptions.TextFormattingMode="Display" 
-                Margin="0,2"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+        <ListBox x:Name="ChatList" Margin="10" HorizontalContentAlignment="Stretch" Background="White">
+            <DataTemplate>
+                <TextBlock FontSize="16" TextWrapping="Wrap" Margin="0,2">
+                <!-- Каждый Run отдельно — это обязательно! -->
+                <Run FontFamily="Segoe UI Emoji" Text="["/>
+                <Run FontFamily="Segoe UI Emoji" Text="{Binding Timestamp, StringFormat=HH\\:mm\\:ss}"/>
+                <Run FontFamily="Segoe UI Emoji" Text="] "/>
+                
+                <Bold>
+                    <Run FontFamily="Segoe UI Emoji" Text="{Binding Player}"/>
+                </Bold>
+                <Run FontFamily="Segoe UI Emoji" Text=": "/>
+                
+                <!-- Весь текст сообщения — отдельным Run с нужным шрифтом -->
+                <Run FontFamily="Segoe UI Emoji" Text="{Binding Text}"/>
+                </TextBlock>
+            </DataTemplate>
         </ListBox>
+
 
 
         <!-- Панель смайликов -->
@@ -41,12 +46,20 @@
                 <!-- Группа: Эмоции -->
                 <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
-                    <Button Width="50" Height="50" Margin="5" Click="Emoji_Click" Tag="😀">
-                        <Image Source="/Images/acute.png" Stretch="Uniform" Margin="5"/>
-                    </Button>
+                    <!--<Button Width="50" Height="50" Margin="5" Click="Emoji_Click" Tag="😀">
+                        <Image Source="/Images/acute.png" Stretch="Uniform" Margin="5"/>-->
 
 
-                    <!--<Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>--><!--
+                        <Button x:Name="BeeButton" 
+        Width="50" Height="50" Margin="5"
+        Click="Emoji_Click" Tag="😀">
+                            <Image Source="/Images/bee.png" 
+           Stretch="Uniform" 
+           Margin="5"/>
+                        </Button>
+
+
+                        <!--<Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😊" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😍" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😎" Click="Emoji_Click"/>
@@ -59,18 +72,17 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>-->
                 </WrapPanel>
 
-                <!-- Группа: Жесты и поддержка -->
-                <!--<TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
+
+                <TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="👍" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="👎" Click="EmojiButtonStyle" />
-                    --><!-- Опечатка в Content выше, исправлено ниже --><!--
+                    <Button Style="{StaticResource EmojiButtonStyle}" Content="👎" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="👏" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🙌" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="💪" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🤝" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="✌️" Click="Emoji_Click"/>
-                </WrapPanel>-->
+                </WrapPanel>
 
                 <!-- Группа: Праздники -->
                 <TextBlock Text="Праздники" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>

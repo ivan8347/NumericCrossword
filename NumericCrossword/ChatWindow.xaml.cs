@@ -16,6 +16,7 @@ namespace NumericCrossword
         public ChatWindow(string playerName)
         {
             InitializeComponent();
+           
             this.playerName = playerName;
 
             timer = new DispatcherTimer();
@@ -24,17 +25,26 @@ namespace NumericCrossword
             timer.Start();
         }
 
-        private async void Timer_Tick(object sender, EventArgs e)
-        {
-            var messages = await GameApi.GetChatMessages();
-            if (messages == null) return;
+       private async void Timer_Tick(object sender, EventArgs e)
+{
+    var messages = await GameApi.GetChatMessages();
+    if (messages == null) return;
 
-            ChatList.Items.Clear();
-            foreach (var m in messages)
-            {
-                ChatList.Items.Add($"{m.Player}: {m.Text}");
-            }
-        }
+    ChatList.Items.Clear();
+
+    foreach (var m in messages)
+    {
+        // Берем время из сообщения. Если сервер вернул дефолтное (0001), берем текущее
+        DateTime timeToShow = m.Time != default(DateTime) ? m.Time : DateTime.Now;
+        
+        // Формат HH:mm:ss покажет секунды. Это критично для проверки!
+        string timeString = timeToShow.ToString("HH:mm:ss");
+
+        string displayText = $"[{timeString}] {m.Player}: {m.Text}";
+        ChatList.Items.Add(displayText);
+    }
+}
+
 
         private async void Send_Click(object sender, RoutedEventArgs e)
         {
@@ -52,13 +62,30 @@ namespace NumericCrossword
 
         private void Emoji_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn)
+            var button = sender as Button;
+            if (button == null) return;
+
+            // Мы всё ещё используем Tag, но теперь он заполнен кодом, а не картинкой
+            string emoji = button.Tag?.ToString() ?? "";
+
+            if (!string.IsNullOrEmpty(emoji))
             {
-                ChatInput.Text += btn.Content.ToString();
-                ChatInput.CaretIndex = ChatInput.Text.Length;
-                ChatInput.Focus();
+                ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
+                ChatInput.CaretIndex += emoji.Length;
             }
         }
+
+
+        //private void Emoji_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var btn = sender as Button;
+        //    if (btn == null || string.IsNullOrEmpty(btn.Tag?.ToString())) return;
+
+        //    string emoji = btn.Tag.ToString();
+        //    // Вставляем символ в TextBox
+        //    ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
+        //    ChatInput.CaretIndex += emoji.Length;
+        //}
 
         private void EmojiButton_Click(object sender, RoutedEventArgs e)
         {
@@ -75,5 +102,7 @@ namespace NumericCrossword
                 e.Handled = true;
             }
         }
+
     }
+
 }
