@@ -50,16 +50,16 @@
                         <Image Source="/Images/acute.png" Stretch="Uniform" Margin="5"/>-->
 
 
-                        <Button x:Name="BeeButton" 
+                        <!--<Button x:Name="BeeButton" 
         Width="50" Height="50" Margin="5"
         Click="Emoji_Click" Tag="😀">
                             <Image Source="/Images/bee.png" 
            Stretch="Uniform" 
            Margin="5"/>
-                        </Button>
+                        </Button>-->
 
 
-                        <!--<Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
+                        <Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😊" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😍" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😎" Click="Emoji_Click"/>
@@ -69,7 +69,7 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😡" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🤯" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🥳" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>-->
+                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>
                 </WrapPanel>
 
 

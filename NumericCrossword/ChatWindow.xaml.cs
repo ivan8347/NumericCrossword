@@ -60,22 +60,30 @@ namespace NumericCrossword
             ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
         }
 
+        //private void Emoji_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var button = sender as Button;
+        //    if (button == null) return;
+
+        //    string emoji = button.Tag?.ToString() ?? "";
+
+        //    if (!string.IsNullOrEmpty(emoji))
+        //    {
+        //        ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
+        //        ChatInput.CaretIndex += emoji.Length;
+        //    }
+        //}
+
         private void Emoji_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button == null) return;
-
-            // Мы всё ещё используем Tag, но теперь он заполнен кодом, а не картинкой
-            string emoji = button.Tag?.ToString() ?? "";
-
-            if (!string.IsNullOrEmpty(emoji))
+            if (sender is Button btn)
             {
-                ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
-                ChatInput.CaretIndex += emoji.Length;
+                ChatInput.Text += btn.Content.ToString();
+                ChatInput.Focus();
+                ChatInput.CaretIndex = ChatInput.Text.Length;
+                ChatInput.Focus();
             }
         }
-
-
         //private void Emoji_Click(object sender, RoutedEventArgs e)
         //{
         //    var btn = sender as Button;
