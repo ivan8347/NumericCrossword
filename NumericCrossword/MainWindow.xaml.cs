@@ -54,8 +54,9 @@ namespace NumericCrossword
         public static PlayerProfile CurrentPlayer;
 
         private ChatWindow chatWindow;
-        private bool hasNewChatMessage = false;
-        private DispatcherTimer chatNotifyTimer = new DispatcherTimer();
+        private bool hasNewChatMessage;
+        private DispatcherTimer chatNotifyTimer;
+        private bool blinkState;
 
 
 
@@ -79,6 +80,9 @@ namespace NumericCrossword
             InitTemplates();
             DifficultyBox.SelectedIndex = 0;
             networkCheckTimer.Interval = TimeSpan.FromSeconds(1);
+            chatNotifyTimer = new DispatcherTimer();
+            chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
+            chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
 
 
         }
@@ -1201,21 +1205,28 @@ namespace NumericCrossword
         {
             hasNewChatMessage = false;
             chatNotifyTimer.Stop();
-            BtnChat.Background = Brushes.LightPink; // возвращаем обычный цвет
+            blinkState = false;
+            BtnChat.Background = Brushes.LightPink;
 
             if (chatWindow == null || !chatWindow.IsLoaded)
             {
                 chatWindow = new ChatWindow(CurrentPlayer.Name);
                 chatWindow.Owner = this;
-                chatWindow.Closed += (s, args) => chatWindow = null;
 
-                // ⭐ ПОДПИСКА — только здесь, при создании окна
+                // КЛЮЧЕВАЯ ПРАВКА: закрываем окно = прячем, а не уничтожаем
+                chatWindow.Closing += (s, args) =>
+                {
+                    args.Cancel = true;   // отменяем настоящее закрытие
+                    chatWindow.Hide();    // просто прячем
+                };
+
+                // Подписка на новые сообщения — один раз, при создании окна
                 chatWindow.OnNewMessageReceived += () =>
                 {
                     hasNewChatMessage = true;
-                    chatNotifyTimer.Start(); // дальше мигает/красит твой таймер
+                    if (!chatNotifyTimer.IsEnabled)
+                        chatNotifyTimer.Start();
                 };
-
 
                 chatWindow.Show();
                 return;
@@ -1225,18 +1236,17 @@ namespace NumericCrossword
             chatWindow.Focus();
         }
 
+        //private void OnChatMessageReceived(string user, string text)
+        //{
+        //    if (chatWindow != null && chatWindow.IsLoaded)
+        //        chatWindow.AddMessage(user, text);
 
-        private void OnChatMessageReceived(string user, string text)
-        {
-            if (chatWindow != null && chatWindow.IsLoaded)
-                chatWindow.AddMessage(user, text);
-
-            if (chatWindow == null || !chatWindow.IsVisible)
-            {
-                hasNewChatMessage = true;
-                StartChatNotification();
-            }
-        }
+        //    if (chatWindow == null || !chatWindow.IsVisible)
+        //    {
+        //        hasNewChatMessage = true;
+        //        StartChatNotification();
+        //    }
+        //}
 
         private void StartChatNotification()
         {
@@ -1249,9 +1259,14 @@ namespace NumericCrossword
         {
             if (hasNewChatMessage)
             {
-                BtnChat.Background = BtnChat.Background == Brushes.Yellow
-                    ? Brushes.LightPink
-                    : Brushes.Yellow;
+                blinkState = !blinkState;
+                BtnChat.Background = blinkState ? Brushes.Red : Brushes.LightPink;
+            }
+            else
+            {
+                BtnChat.Background = Brushes.LightPink;
+                blinkState = false;
+                chatNotifyTimer.Stop();
             }
         }
 

@@ -110,14 +110,52 @@ namespace NumericCrossword
             }
         }
 
+        // Выбранный кликом адресат (null = пишем всем)
+        private string selectedRecipient = null;
+
+        // Клик по имени игрока в чате — выбираем его как адресата
+        private void Sender_Click(object sender, MouseButtonEventArgs e)
+        {
+            var tb = (TextBlock)sender;
+            var msg = tb.DataContext as ChatMessageItem;
+
+            // Своё имя кликать бессмысленно
+            if (msg == null || msg.IsMine) return;
+
+            selectedRecipient = msg.Sender;
+            UpdateRecipientIndicator();
+            ChatInput.Focus();
+        }
+
+        // Кнопка "×" — снять выбор адресата
+        private void ClearRecipient_Click(object sender, RoutedEventArgs e)
+        {
+            selectedRecipient = null;
+            UpdateRecipientIndicator();
+        }
+
+        private void UpdateRecipientIndicator()
+        {
+            if (!string.IsNullOrEmpty(selectedRecipient))
+            {
+                RecipientIndicatorText.Text = $"Кому: {selectedRecipient}";
+                RecipientIndicator.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                RecipientIndicator.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private async void Send_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ChatInput.Text)) return;
 
             string text = ChatInput.Text.Trim();
-            string recipient = null;
+            string recipient = selectedRecipient;
 
-            if (text.StartsWith("@"))
+            // Оставляем поддержку "@Ник" как запасной вариант (пока приоритет у клика)
+            if (recipient == null && text.StartsWith("@"))
             {
                 int spaceIndex = text.IndexOf(' ');
                 if (spaceIndex > 1)
@@ -129,6 +167,13 @@ namespace NumericCrossword
 
             await GameApi.SendChatMessage(playerName, text, recipient);
             ChatInput.Text = "";
+
+            // После отправки снимаем выбор — следующий вопрос может быть уже другому
+            if (recipient != null)
+            {
+                selectedRecipient = null;
+                UpdateRecipientIndicator();
+            }
         }
 
         public void AddMessage(string user, string text)

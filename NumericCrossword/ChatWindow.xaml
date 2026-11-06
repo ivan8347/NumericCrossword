@@ -4,17 +4,16 @@
         Title="Чат" Width="400" Height="500">
 
     <Window.Resources>
-        <!-- Стиль элемента списка: выравнивание и цвета -->
         <Style x:Key="ChatItemStyle" TargetType="ListBoxItem">
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <!-- Убираем стандартную синюю подсветку выделения, чтобы чат выглядел чисто -->
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border Background="{TemplateBinding Background}"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter/>
+                            <!-- КЛЮЧЕВОЕ: привязка выравнивания к ContentPresenter -->
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -38,35 +37,31 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Список сообщений -->
         <ListBox x:Name="ChatList"
-                 Margin="10"
+                 Grid.Row="0"
+                 Margin="0,0,0,5"
                  Background="White"
                  ItemContainerStyle="{StaticResource ChatItemStyle}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="5,2" Padding="6,4" CornerRadius="6"
-                            Background="{Binding IsMine, Converter={x:Null}}">
-                        <StackPanel MaxWidth="320">
+                    <Border Margin="5,2" Padding="6,4" CornerRadius="6">
+                        <StackPanel MaxWidth="300">
                             <WrapPanel>
-                                <!-- Время -->
-                                <TextBlock Text="{Binding Time}"
-                                           FontSize="11"
-                                           Foreground="#888"
-                                           Margin="0,0,6,0"
-                                           VerticalAlignment="Top"/>
-
-                                <!-- Имя отправителя -->
+                                <!-- Имя отправителя — КЛИКАБЕЛЬНОЕ: выбирает адресата -->
                                 <TextBlock Text="{Binding Sender}"
                                            FontWeight="Bold"
                                            Margin="0,0,4,0"
-                                           VerticalAlignment="Top"/>
+                                           VerticalAlignment="Top"
+                                           Cursor="Hand"
+                                           MouseLeftButtonDown="Sender_Click"/>
 
-                                <!-- Адресат: "→ Вася" (виден только у личных) -->
+                                <!-- Адресат "→ XZ" (виден только у личных сообщений) -->
                                 <TextBlock Text="{Binding RecipientDisplay}"
                                            Foreground="DarkOrange"
                                            FontWeight="SemiBold"
@@ -76,8 +71,7 @@
                                 <!-- Текст сообщения -->
                                 <TextBlock Text="{Binding Text}"
                                            TextWrapping="Wrap"
-                                           FontSize="14"
-                                           VerticalAlignment="Top"/>
+                                           FontSize="14"/>
                             </WrapPanel>
                         </StackPanel>
                     </Border>
@@ -95,7 +89,6 @@
               HorizontalScrollBarVisibility="Disabled">
 
             <StackPanel>
-                <!-- Группа: Эмоции -->
                 <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
@@ -122,7 +115,6 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="✌️" Click="Emoji_Click"/>
                 </WrapPanel>
 
-                <!-- Группа: Праздники -->
                 <TextBlock Text="Праздники" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🎉" Click="Emoji_Click"/>
@@ -135,7 +127,6 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🥇" Click="Emoji_Click"/>
                 </WrapPanel>
 
-                <!-- Группа: Предметы -->
                 <TextBlock Text="Разное" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🧩" Click="Emoji_Click"/>
@@ -147,21 +138,49 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Поле ввода + кнопки -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <!-- Индикатор выбранного адресата -->
+        <StackPanel x:Name="RecipientIndicator"
+                    Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,3"
+                    Visibility="Collapsed">
+            <TextBlock x:Name="RecipientIndicatorText"
+                       Text="Кому: "
+                       FontWeight="SemiBold"
+                       Foreground="DarkOrange"/>
+            <Button Content="×"
+                    Width="20" Height="20"
+                    Padding="0,-3,0,0"
+                    Margin="4,0,0,0"
+                    Click="ClearRecipient_Click"
+                    ToolTip="Отменить выбор адресата (отправить всем)"/>
+        </StackPanel>
+
+        <!-- Поле ввода + кнопки: Grid вместо StackPanel, чтобы ничего не обрезалось -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
             <TextBox x:Name="ChatInput"
-                     Width="260"
                      Margin="0,5,5,0"
                      KeyDown="ChatInput_KeyDown"
                      VerticalContentAlignment="Center"/>
 
             <Button x:Name="EmojiButton"
+                    Grid.Column="1"
                     Content="😊"
                     Width="40"
                     Margin="0,5,5,0"
                     Click="EmojiButton_Click"/>
 
-            <Button Content="Отправить" Width="80" Click="Send_Click" />
-        </StackPanel>
+            <Button Grid.Column="2"
+                    Content="Отправить"
+                    MinWidth="80"
+                    Margin="0,5,0,0"
+                    Click="Send_Click"/>
+        </Grid>
     </Grid>
 </Window>
