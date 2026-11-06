@@ -1236,17 +1236,17 @@ namespace NumericCrossword
             chatWindow.Focus();
         }
 
-        //private void OnChatMessageReceived(string user, string text)
-        //{
-        //    if (chatWindow != null && chatWindow.IsLoaded)
-        //        chatWindow.AddMessage(user, text);
+        private void OnChatMessageReceived(string user, string text)
+        {
+            if (chatWindow != null && chatWindow.IsLoaded)
+                chatWindow.AddMessage(user, text);
 
-        //    if (chatWindow == null || !chatWindow.IsVisible)
-        //    {
-        //        hasNewChatMessage = true;
-        //        StartChatNotification();
-        //    }
-        //}
+            if (chatWindow == null || !chatWindow.IsVisible)
+            {
+                hasNewChatMessage = true;
+                StartChatNotification();
+            }
+        }
 
         private void StartChatNotification()
         {
