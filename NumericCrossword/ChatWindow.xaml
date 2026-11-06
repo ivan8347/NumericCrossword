@@ -53,6 +53,11 @@
                     <Border Margin="5,2" Padding="6,4" CornerRadius="6">
                         <StackPanel MaxWidth="300">
                             <WrapPanel>
+                                <TextBlock Text="{Binding Time}"
+                               FontSize="11"
+                               Foreground="#888"
+                               Margin="0,0,6,0"
+                               VerticalAlignment="Top"/>
                                 <!-- Имя отправителя — КЛИКАБЕЛЬНОЕ: выбирает адресата -->
                                 <TextBlock Text="{Binding Sender}"
                                            FontWeight="Bold"
