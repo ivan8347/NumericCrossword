@@ -60,6 +60,7 @@ namespace NumericCrossword.Core
         public string Player { get; set; }
         public string Text { get; set; }
         public DateTime Time { get; set; }
+        public string Recipient { get; set; }
     }
 
     public static class GameApi
@@ -212,14 +213,33 @@ namespace NumericCrossword.Core
         }
 
 
-        public static async Task SendChatMessage(string player, string text)
+        //public static async Task SendChatMessage(string player, string text)
+        //{
+        //    var Time = DateTime.UtcNow;
+        //    var msg = new
+        //    {
+        //        Player = player,
+        //        Text = text,
+
+        //    };
+
+        //    try
+        //    {
+        //        await http.PostAsJsonAsync("/chat", msg);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine("Chat send error: " + ex.Message);
+        //    }
+        //}
+
+        public static async Task SendChatMessage(string player, string text, string recipient = null)
         {
-            var Time = DateTime.UtcNow;
             var msg = new
             {
                 Player = player,
                 Text = text,
-               
+                Recipient = recipient // null, если сообщение всем
             };
 
             try
@@ -232,11 +252,28 @@ namespace NumericCrossword.Core
             }
         }
 
-        public static async Task<List<ChatMessageDto>> GetChatMessages()
+
+        //public static async Task<List<ChatMessageDto>> GetChatMessages()
+        //{
+        //    try
+        //    {
+        //        var response = await http.GetAsync("/chat");
+        //        if (!response.IsSuccessStatusCode)
+        //            return new List<ChatMessageDto>();
+
+        //        return await response.Content.ReadFromJsonAsync<List<ChatMessageDto>>() ?? new List<ChatMessageDto>();
+        //    }
+        //    catch
+        //    {
+        //        return new List<ChatMessageDto>();
+        //    }
+        //}
+
+        public static async Task<List<ChatMessageDto>> GetChatMessages(string playerName)
         {
             try
             {
-                var response = await http.GetAsync("/chat");
+                var response = await http.GetAsync($"/chat?player={Uri.EscapeDataString(playerName)}");
                 if (!response.IsSuccessStatusCode)
                     return new List<ChatMessageDto>();
 
@@ -247,6 +284,7 @@ namespace NumericCrossword.Core
                 return new List<ChatMessageDto>();
             }
         }
+
 
         /// <summary>
         /// Получает рейтинг с сервера. Если сервер недоступен — возвращает демо-данные (локальный рейтинг).

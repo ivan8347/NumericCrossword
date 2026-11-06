@@ -280,7 +280,7 @@ namespace NumericCrossword
 
           if (IsOnlineGame)
     {
-        await TryFinishOnlineGameIfSolved();  // <-- await
+        await TryFinishOnlineGameIfSolved();  
         return;
     }
         }
@@ -1201,13 +1201,22 @@ namespace NumericCrossword
         {
             hasNewChatMessage = false;
             chatNotifyTimer.Stop();
-            BtnChat.Background = Brushes.LightPink;
+            BtnChat.Background = Brushes.LightPink; // возвращаем обычный цвет
 
             if (chatWindow == null || !chatWindow.IsLoaded)
             {
                 chatWindow = new ChatWindow(CurrentPlayer.Name);
                 chatWindow.Owner = this;
                 chatWindow.Closed += (s, args) => chatWindow = null;
+
+                // ⭐ ПОДПИСКА — только здесь, при создании окна
+                chatWindow.OnNewMessageReceived += () =>
+                {
+                    hasNewChatMessage = true;
+                    chatNotifyTimer.Start(); // дальше мигает/красит твой таймер
+                };
+
+
                 chatWindow.Show();
                 return;
             }
@@ -1215,6 +1224,7 @@ namespace NumericCrossword
             chatWindow.Show();
             chatWindow.Focus();
         }
+
 
         private void OnChatMessageReceived(string user, string text)
         {

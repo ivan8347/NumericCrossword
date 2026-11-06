@@ -3,6 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Чат" Width="400" Height="500">
 
+    <Window.Resources>
+        <!-- Стиль элемента списка: выравнивание и цвета -->
+        <Style x:Key="ChatItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <!-- Убираем стандартную синюю подсветку выделения, чтобы чат выглядел чисто -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <!-- Моё сообщение — справа -->
+                <DataTrigger Binding="{Binding IsMine}" Value="True">
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                </DataTrigger>
+                <!-- Личное для меня — красным и жирным -->
+                <DataTrigger Binding="{Binding IsPersonalForMe}" Value="True">
+                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -10,28 +40,50 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-
         <!-- Список сообщений -->
-        <ListBox x:Name="ChatList" Margin="10" HorizontalContentAlignment="Stretch" Background="White">
-            <DataTemplate>
-                <TextBlock FontSize="16" TextWrapping="Wrap" Margin="0,2">
-                <!-- Каждый Run отдельно — это обязательно! -->
-                <Run FontFamily="Segoe UI Emoji" Text="["/>
-                <Run FontFamily="Segoe UI Emoji" Text="{Binding Timestamp, StringFormat=HH\\:mm\\:ss}"/>
-                <Run FontFamily="Segoe UI Emoji" Text="] "/>
-                
-                <Bold>
-                    <Run FontFamily="Segoe UI Emoji" Text="{Binding Player}"/>
-                </Bold>
-                <Run FontFamily="Segoe UI Emoji" Text=": "/>
-                
-                <!-- Весь текст сообщения — отдельным Run с нужным шрифтом -->
-                <Run FontFamily="Segoe UI Emoji" Text="{Binding Text}"/>
-                </TextBlock>
-            </DataTemplate>
+        <ListBox x:Name="ChatList"
+                 Margin="10"
+                 Background="White"
+                 ItemContainerStyle="{StaticResource ChatItemStyle}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="5,2" Padding="6,4" CornerRadius="6"
+                            Background="{Binding IsMine, Converter={x:Null}}">
+                        <StackPanel MaxWidth="320">
+                            <WrapPanel>
+                                <!-- Время -->
+                                <TextBlock Text="{Binding Time}"
+                                           FontSize="11"
+                                           Foreground="#888"
+                                           Margin="0,0,6,0"
+                                           VerticalAlignment="Top"/>
+
+                                <!-- Имя отправителя -->
+                                <TextBlock Text="{Binding Sender}"
+                                           FontWeight="Bold"
+                                           Margin="0,0,4,0"
+                                           VerticalAlignment="Top"/>
+
+                                <!-- Адресат: "→ Вася" (виден только у личных) -->
+                                <TextBlock Text="{Binding RecipientDisplay}"
+                                           Foreground="DarkOrange"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,4,0"
+                                           VerticalAlignment="Top"/>
+
+                                <!-- Текст сообщения -->
+                                <TextBlock Text="{Binding Text}"
+                                           TextWrapping="Wrap"
+                                           FontSize="14"
+                                           VerticalAlignment="Top"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
-
-
 
         <!-- Панель смайликов -->
         <ScrollViewer x:Name="EmojiPanel"
@@ -46,20 +98,7 @@
                 <!-- Группа: Эмоции -->
                 <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
-                    <!--<Button Width="50" Height="50" Margin="5" Click="Emoji_Click" Tag="😀">
-                        <Image Source="/Images/acute.png" Stretch="Uniform" Margin="5"/>-->
-
-
-                        <!--<Button x:Name="BeeButton" 
-        Width="50" Height="50" Margin="5"
-        Click="Emoji_Click" Tag="😀">
-                            <Image Source="/Images/bee.png" 
-           Stretch="Uniform" 
-           Margin="5"/>
-                        </Button>-->
-
-
-                        <Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😊" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😍" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😎" Click="Emoji_Click"/>
@@ -71,7 +110,6 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🥳" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>
                 </WrapPanel>
-
 
                 <TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
                 <WrapPanel>
@@ -109,14 +147,13 @@
             </StackPanel>
         </ScrollViewer>
 
-
         <!-- Поле ввода + кнопки -->
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <TextBox x:Name="ChatInput" 
-      Width="260" 
-      Margin="0,5,5,0" 
-      KeyDown="ChatInput_KeyDown"
-      VerticalContentAlignment="Center"/>
+            <TextBox x:Name="ChatInput"
+                     Width="260"
+                     Margin="0,5,5,0"
+                     KeyDown="ChatInput_KeyDown"
+                     VerticalContentAlignment="Center"/>
 
             <Button x:Name="EmojiButton"
                     Content="😊"

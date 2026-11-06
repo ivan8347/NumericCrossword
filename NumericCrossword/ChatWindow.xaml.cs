@@ -1,5 +1,8 @@
 ﻿using NumericCrossword.Core;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,16 +11,36 @@ using System.Windows.Threading;
 
 namespace NumericCrossword
 {
+    public class ChatMessageItem
+    {
+        public string Sender { get; set; }
+        public string Text { get; set; }
+        public string Time { get; set; }
+        public string RecipientDisplay { get; set; }
+
+        public bool IsMine { get; set; }
+        public bool IsPersonalForMe { get; set; }
+        public bool IsPersonalGeneral { get; set; }
+    }
+
     public partial class ChatWindow : Window
     {
         private string playerName;
         private DispatcherTimer timer;
 
+        // Список сообщений для ListBox
+        public ObservableCollection<ChatMessageItem> Messages { get; set; } = new ObservableCollection<ChatMessageItem>();
+
+        // Событие для главного окна: "пришло новое сообщение"
+        public event Action OnNewMessageReceived;
+
         public ChatWindow(string playerName)
         {
             InitializeComponent();
-           
+
             this.playerName = playerName;
+
+            ChatList.ItemsSource = Messages;
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
@@ -25,54 +48,106 @@ namespace NumericCrossword
             timer.Start();
         }
 
-       private async void Timer_Tick(object sender, EventArgs e)
-{
-    var messages = await GameApi.GetChatMessages();
-    if (messages == null) return;
+        private async void Timer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                var rawMessages = await GameApi.GetChatMessages(playerName);
+                if (rawMessages == null) return;
 
-    ChatList.Items.Clear();
+                bool hasNew = false;
 
-    foreach (var m in messages)
-    {
-        // Берем время из сообщения. Если сервер вернул дефолтное (0001), берем текущее
-        DateTime timeToShow = m.Time != default(DateTime) ? m.Time : DateTime.Now;
-        
-        // Формат HH:mm:ss покажет секунды. Это критично для проверки!
-        string timeString = timeToShow.ToString("HH:mm:ss");
+                foreach (var m in rawMessages)
+                {
+                    // Пропускаем дубликаты
+                    if (Messages.Any(x => x.Text == m.Text && x.Sender == m.Player))
+                        continue;
 
-        string displayText = $"[{timeString}] {m.Player}: {m.Text}";
-        ChatList.Items.Add(displayText);
-    }
-}
+                    DateTime timeToShow = (m.Time != default(DateTime))
+                        ? m.Time.AddHours(3)
+                        : DateTime.UtcNow.AddHours(3);
 
+                    string timeString = timeToShow.ToString("HH:mm:ss");
+
+                    bool isMine = m.Player == playerName;
+                    bool isPersonalForMe = !string.IsNullOrEmpty(m.Recipient); // сервер отдал лично мне
+
+                    string recipientDisplay = isPersonalForMe ? $"→ {m.Recipient}" : "";
+
+                    var newItem = new ChatMessageItem
+                    {
+                        Sender = m.Player,
+                        Text = m.Text,
+                        Time = timeString,
+                        RecipientDisplay = recipientDisplay,
+
+                        IsMine = isMine,
+                        IsPersonalForMe = isPersonalForMe,
+                        IsPersonalGeneral = false
+                    };
+
+                    Messages.Add(newItem);
+                    hasNew = true;
+                }
+
+                if (hasNew)
+                {
+                    // Пищим только если окно чата не активно (не в фокусе)
+                    if (!IsFocused && !IsActive)
+                    {
+                        SystemSounds.Beep.Play();
+                        OnNewMessageReceived?.Invoke();
+                    }
+
+                    if (Messages.Count > 0)
+                        ChatList.ScrollIntoView(Messages[Messages.Count - 1]);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Chat Error: {ex.Message}");
+            }
+        }
 
         private async void Send_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(ChatInput.Text)) return;
 
-            await GameApi.SendChatMessage(playerName, ChatInput.Text);
+            string text = ChatInput.Text.Trim();
+            string recipient = null;
+
+            if (text.StartsWith("@"))
+            {
+                int spaceIndex = text.IndexOf(' ');
+                if (spaceIndex > 1)
+                {
+                    recipient = text.Substring(1, spaceIndex - 1);
+                    text = text.Substring(spaceIndex).TrimStart();
+                }
+            }
+
+            await GameApi.SendChatMessage(playerName, text, recipient);
             ChatInput.Text = "";
         }
 
         public void AddMessage(string user, string text)
         {
-            ChatList.Items.Add($"{user}: {text}");
-            ChatList.ScrollIntoView(ChatList.Items[ChatList.Items.Count - 1]);
+            // Добавляем через коллекцию, а не через ChatList.Items,
+            // иначе при установленном ItemsSource будет исключение
+            Messages.Add(new ChatMessageItem
+            {
+                Sender = user,
+                Text = text,
+                Time = DateTime.Now.ToString("HH:mm:ss"),
+                IsMine = user == playerName,
+                IsPersonalForMe = false,
+                IsPersonalGeneral = false
+            });
+
+            if (Messages.Count > 0)
+                ChatList.ScrollIntoView(Messages[Messages.Count - 1]);
         }
-
-        //private void Emoji_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var button = sender as Button;
-        //    if (button == null) return;
-
-        //    string emoji = button.Tag?.ToString() ?? "";
-
-        //    if (!string.IsNullOrEmpty(emoji))
-        //    {
-        //        ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
-        //        ChatInput.CaretIndex += emoji.Length;
-        //    }
-        //}
 
         private void Emoji_Click(object sender, RoutedEventArgs e)
         {
@@ -81,19 +156,8 @@ namespace NumericCrossword
                 ChatInput.Text += btn.Content.ToString();
                 ChatInput.Focus();
                 ChatInput.CaretIndex = ChatInput.Text.Length;
-                ChatInput.Focus();
             }
         }
-        //private void Emoji_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var btn = sender as Button;
-        //    if (btn == null || string.IsNullOrEmpty(btn.Tag?.ToString())) return;
-
-        //    string emoji = btn.Tag.ToString();
-        //    // Вставляем символ в TextBox
-        //    ChatInput.Text = ChatInput.Text.Insert(ChatInput.CaretIndex, emoji);
-        //    ChatInput.CaretIndex += emoji.Length;
-        //}
 
         private void EmojiButton_Click(object sender, RoutedEventArgs e)
         {
@@ -102,6 +166,7 @@ namespace NumericCrossword
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         }
+
         private void ChatInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -110,7 +175,5 @@ namespace NumericCrossword
                 e.Handled = true;
             }
         }
-
     }
-
 }
