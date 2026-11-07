@@ -217,8 +217,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\bee.png" />
-    <Resource Include="Images\acute.png" />
+    <Resource Include="Images\Emoji\acute.png" />
+    <Resource Include="Images\Emoji\bee.png" />
     <None Include="App.config" />
     <None Include="Data\players.json" />
     <None Include="Data\scores.json" />

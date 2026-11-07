@@ -6,23 +6,18 @@
     <Window.Resources>
         <Style x:Key="ChatItemStyle" TargetType="ListBoxItem">
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border Background="{TemplateBinding Background}"
                                 Padding="{TemplateBinding Padding}">
-                            <!-- КЛЮЧЕВОЕ: привязка выравнивания к ContentPresenter -->
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
-                <!-- Моё сообщение — справа -->
-                <DataTrigger Binding="{Binding IsMine}" Value="True">
-                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                </DataTrigger>
                 <!-- Личное для меня — красным и жирным -->
                 <DataTrigger Binding="{Binding IsPersonalForMe}" Value="True">
                     <Setter Property="Foreground" Value="Red"/>
@@ -30,6 +25,39 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Содержимое сообщения: имя + адресат + текст -->
+        <DataTemplate x:Key="MessageContent">
+            <StackPanel>
+                <!-- Первая строка: имя и адресат -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Sender}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,4,0"
+                               VerticalAlignment="Center"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="Sender_Click"/>
+
+                    <TextBlock Text="{Binding RecipientDisplay}"
+                               FontSize="20"
+                               Foreground="DarkOrange"
+                               FontWeight="SemiBold"
+                               Margin="0,0,4,0"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Вторая строка: текст с картинками-эмодзи.
+                     Loaded обязателен: DataContextChanged может не сработать,
+                     если DataContext был установлен до загрузки в дерево. -->
+                <TextBlock FontSize="20"
+                           DataContextChanged="MessageText_DataContextChanged"
+                           Loaded="MessageText_Loaded"
+                           TextWrapping="Wrap"
+                           Margin="0,2,0,0"
+                           VerticalAlignment="Top"/>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid Margin="10">
@@ -45,58 +73,74 @@
                  Grid.Row="0"
                  Margin="0,0,0,5"
                  Background="White"
+                 HorizontalContentAlignment="Stretch"
                  ItemContainerStyle="{StaticResource ChatItemStyle}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="5,2" Padding="6,4" CornerRadius="6">
-                        <StackPanel MaxWidth="300">
-                            <WrapPanel>
-                                <TextBlock Text="{Binding Time}"
-                               FontSize="11"
-                               Foreground="#888"
-                               Margin="0,0,6,0"
-                               VerticalAlignment="Top"/>
-                                <!-- Имя отправителя — КЛИКАБЕЛЬНОЕ: выбирает адресата -->
-                                <TextBlock Text="{Binding Sender}"
-                                           FontWeight="Bold"
-                                           Margin="0,0,4,0"
-                                           VerticalAlignment="Top"
-                                           Cursor="Hand"
-                                           MouseLeftButtonDown="Sender_Click"/>
+                    <Grid Margin="5,2">
+                        <Grid.ColumnDefinitions>
+                            <!-- Время: всегда слева -->
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Сообщение -->
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                                <!-- Адресат "→ XZ" (виден только у личных сообщений) -->
-                                <TextBlock Text="{Binding RecipientDisplay}"
-                                           Foreground="DarkOrange"
-                                           FontWeight="SemiBold"
-                                           Margin="0,0,4,0"
-                                           VerticalAlignment="Top"/>
+                        <!-- Время в скобках -->
+                        <TextBlock Grid.Column="0"
+                                   FontSize="12"
+                                   Foreground="#888"
+                                   Margin="0,10,6,0"
+                                   VerticalAlignment="Top">
+                            <Run Text="["/><Run Text="{Binding Time, Mode=OneWay}"/><Run Text="] "/>
+                        </TextBlock>
 
-                                <!-- Текст сообщения -->
-                                <TextBlock Text="{Binding Text}"
-                                           TextWrapping="Wrap"
-                                           FontSize="14"/>
-                            </WrapPanel>
-                        </StackPanel>
-                    </Border>
+                        <!-- Пузырь: все слева, свои подкрашены жёлтым.
+                             Background задан только через стиль, не атрибутом. -->
+                       <Border Grid.Column="1"
+        CornerRadius="6"
+        MaxWidth="340"
+        Padding="6,4"
+        HorizontalAlignment="Left">
+    <Border.Style>
+        <Style TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <!-- Свои — жёлтый -->
+                <DataTrigger Binding="{Binding IsMine}" Value="True">
+                    <Setter Property="Background" Value="#FFF3B0"/>
+                </DataTrigger>
+                <!-- Личное для меня — голубой (идёт ПОСЛЕ жёлтого, значит побеждает при совпадении) -->
+                <DataTrigger Binding="{Binding IsPersonalForMe}" Value="True">
+                    <Setter Property="Background" Value="LightSkyBlue"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
+    <ContentControl Content="{Binding}"
+                    ContentTemplate="{StaticResource MessageContent}"/>
+</Border>
+
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
         <!-- Панель смайликов -->
         <ScrollViewer x:Name="EmojiPanel"
-              Grid.Row="1"
-              Visibility="Collapsed"
-              MaxHeight="160"
-              VerticalScrollBarVisibility="Auto"
-              Margin="0,5,0,5"
-              HorizontalScrollBarVisibility="Disabled">
-
+                      Grid.Row="1"
+                      Visibility="Collapsed"
+                      MaxHeight="160"
+                      VerticalScrollBarVisibility="Auto"
+                      Margin="0,5,0,5"
+                      HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
-                <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
+                <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😂" Click="Emoji_Click"/>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😂" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/acute.png" Width="32" Height="32"/>
+                    </Button>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😊" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😍" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😎" Click="Emoji_Click"/>
@@ -109,7 +153,7 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>
                 </WrapPanel>
 
-                <TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
+                <TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="👍" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="👎" Click="Emoji_Click"/>
@@ -120,7 +164,7 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="✌️" Click="Emoji_Click"/>
                 </WrapPanel>
 
-                <TextBlock Text="Праздники" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
+                <TextBlock Text="Праздники" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🎉" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🔥" Click="Emoji_Click"/>
@@ -132,7 +176,7 @@
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🥇" Click="Emoji_Click"/>
                 </WrapPanel>
 
-                <TextBlock Text="Разное" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="13"/>
+                <TextBlock Text="Разное" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="🧩" Click="Emoji_Click"/>
                     <Button Style="{StaticResource EmojiButtonStyle}" Content="⏰" Click="Emoji_Click"/>
@@ -161,7 +205,7 @@
                     ToolTip="Отменить выбор адресата (отправить всем)"/>
         </StackPanel>
 
-        <!-- Поле ввода + кнопки: Grid вместо StackPanel, чтобы ничего не обрезалось -->
+        <!-- Поле ввода + кнопки -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -174,12 +218,14 @@
                      KeyDown="ChatInput_KeyDown"
                      VerticalContentAlignment="Center"/>
 
+            <!-- Кнопка эмодзи с картинкой -->
             <Button x:Name="EmojiButton"
                     Grid.Column="1"
-                    Content="😊"
                     Width="40"
                     Margin="0,5,5,0"
-                    Click="EmojiButton_Click"/>
+                    Click="EmojiButton_Click">
+                <Image Source="/Images/Emoji/bee.png" Width="32" Height="32" Stretch="Uniform"/>
+            </Button>
 
             <Button Grid.Column="2"
                     Content="Отправить"

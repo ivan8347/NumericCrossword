@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumericCrossword", "Numeric
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordServer", "..\CrosswordServer\CrosswordServer\CrosswordServer.csproj", "{0CF9E37B-F47B-475C-818E-F5909FC41C37}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup1", "Setup1\Setup1.vdproj", "{7884BF9D-FBB3-45D7-955C-055FCF392842}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,13 +31,6 @@ Global
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Release|x86.ActiveCfg = Release|x86
 		{0CF9E37B-F47B-475C-818E-F5909FC41C37}.Release|x86.Build.0 = Release|x86
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Debug|Any CPU.ActiveCfg = Debug
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Debug|Any CPU.Build.0 = Debug
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Debug|x86.ActiveCfg = Debug
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Debug|x86.Build.0 = Debug
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Release|Any CPU.ActiveCfg = Release
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Release|x86.ActiveCfg = Release
-		{7884BF9D-FBB3-45D7-955C-055FCF392842}.Release|x86.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
