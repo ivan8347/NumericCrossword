@@ -218,8 +218,8 @@ namespace NumericCrossword
 
         private static readonly Dictionary<string, string> EmojiImages = new Dictionary<string, string>
         {
-            ["😂"] = "/Images/Emoji/acute.png",
-            ["😊"] = "/Images/Emoji/bee.png",
+            ["😂"] = "/Images/Emoji/air_kiss.gif",   
+            ["😊"] = "/Images/Emoji/1f60a.png",   
             ["😍"] = "/Images/Emoji/1f60d.png",
             ["😎"] = "/Images/Emoji/1f60e.png",
             ["🤔"] = "/Images/Emoji/1f914.png",
@@ -316,7 +316,7 @@ namespace NumericCrossword
             {
                 var bmp = new BitmapImage();
                 bmp.BeginInit();
-                bmp.UriSource = new Uri("pack://application:,," + resourcePath, UriKind.Absolute);
+                bmp.UriSource = new Uri("pack://application:,,," + resourcePath, UriKind.Absolute);
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
                 bmp.EndInit();
                 bmp.Freeze();

@@ -45,6 +45,8 @@
     <LangVersion>7.3</LangVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -57,10 +59,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -217,8 +217,39 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Emoji\air_kiss.gif" />
+    <Resource Include="Images\Emoji\1f389.png" />
+    <Resource Include="Images\Emoji\1f3af.png" />
+    <Resource Include="Images\Emoji\1f3c6.png" />
+    <Resource Include="Images\Emoji\1f44d.png" />
+    <Resource Include="Images\Emoji\1f44e.png" />
+    <Resource Include="Images\Emoji\1f44f.png" />
+    <Resource Include="Images\Emoji\1f4a1.png" />
+    <Resource Include="Images\Emoji\1f4aa.png" />
+    <Resource Include="Images\Emoji\1f4af.png" />
+    <Resource Include="Images\Emoji\1f525.png" />
+    <Resource Include="Images\Emoji\1f602.png" />
+    <Resource Include="Images\Emoji\1f60a.png" />
+    <Resource Include="Images\Emoji\1f60c.png" />
+    <Resource Include="Images\Emoji\1f60d.png" />
+    <Resource Include="Images\Emoji\1f60e.png" />
+    <Resource Include="Images\Emoji\1f621.png" />
+    <Resource Include="Images\Emoji\1f622.png" />
+    <Resource Include="Images\Emoji\1f634.png" />
+    <Resource Include="Images\Emoji\1f64c.png" />
+    <Resource Include="Images\Emoji\1f680.png" />
+    <Resource Include="Images\Emoji\1f914.png" />
+    <Resource Include="Images\Emoji\1f91d.png" />
+    <Resource Include="Images\Emoji\1f92f.png" />
+    <Resource Include="Images\Emoji\1f947.png" />
+    <Resource Include="Images\Emoji\1f973.png" />
+    <Resource Include="Images\Emoji\1f9e9.png" />
+    <Resource Include="Images\Emoji\23f0.png" />
+    <Resource Include="Images\Emoji\270c.png" />
+    <Resource Include="Images\Emoji\2728.png" />
+    <Resource Include="Images\Emoji\2764.png" />
+    <Resource Include="Images\Emoji\2b50.png" />
     <Resource Include="Images\Emoji\acute.png" />
-    <Resource Include="Images\Emoji\bee.png" />
     <None Include="App.config" />
     <None Include="Data\players.json" />
     <None Include="Data\scores.json" />

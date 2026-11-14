@@ -98,29 +98,29 @@
 
                         <!-- Пузырь: все слева, свои подкрашены жёлтым.
                              Background задан только через стиль, не атрибутом. -->
-                       <Border Grid.Column="1"
+                        <Border Grid.Column="1"
         CornerRadius="6"
         MaxWidth="340"
         Padding="6,4"
         HorizontalAlignment="Left">
-    <Border.Style>
-        <Style TargetType="Border">
-            <Setter Property="Background" Value="White"/>
-            <Style.Triggers>
-                <!-- Свои — жёлтый -->
-                <DataTrigger Binding="{Binding IsMine}" Value="True">
-                    <Setter Property="Background" Value="#FFF3B0"/>
-                </DataTrigger>
-                <!-- Личное для меня — голубой (идёт ПОСЛЕ жёлтого, значит побеждает при совпадении) -->
-                <DataTrigger Binding="{Binding IsPersonalForMe}" Value="True">
-                    <Setter Property="Background" Value="LightSkyBlue"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Border.Style>
-    <ContentControl Content="{Binding}"
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="White"/>
+                                    <Style.Triggers>
+                                        <!-- Свои — жёлтый -->
+                                        <DataTrigger Binding="{Binding IsMine}" Value="True">
+                                            <Setter Property="Background" Value="#FFF3B0"/>
+                                        </DataTrigger>
+                                        <!-- Личное для меня — голубой (идёт ПОСЛЕ жёлтого, значит побеждает при совпадении) -->
+                                        <DataTrigger Binding="{Binding IsPersonalForMe}" Value="True">
+                                            <Setter Property="Background" Value="LightSkyBlue"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <ContentControl Content="{Binding}"
                     ContentTemplate="{StaticResource MessageContent}"/>
-</Border>
+                        </Border>
 
                     </Grid>
                 </DataTemplate>
@@ -138,51 +138,108 @@
             <StackPanel>
                 <TextBlock Text="Эмоции" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
+                    
                     <Button Style="{StaticResource EmojiButtonStyle}" Tag="😂" Click="Emoji_Click">
-                        <Image Source="/Images/Emoji/acute.png" Width="32" Height="32"/>
+                        <Image Source="/Images/Emoji/air_kiss.gif" Width="32" Height="32"/>
                     </Button>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😊" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😍" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😎" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🤔" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😴" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😢" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😡" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🤯" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🥳" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="😌" Click="Emoji_Click"/>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😊" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f60a.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😍" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f60d.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😎" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f60e.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🤔" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f914.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😴" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f634.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😢" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f622.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😡" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f621.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🤯" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f92f.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🥳" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f973.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="😌" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f60c.png" Width="32" Height="32"/>
+                    </Button>
                 </WrapPanel>
+
 
                 <TextBlock Text="Поддержка" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="👍" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="👎" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="👏" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🙌" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="💪" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🤝" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="✌️" Click="Emoji_Click"/>
-                </WrapPanel>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="👍" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f44d.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="👎" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f44e.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="👏" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f44f.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🙌" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f64c.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="💪" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f4aa.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🤝" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f91d.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="✌️" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/270c.png" Width="32" Height="32"/>
+                    </Button>
 
+                </WrapPanel>
                 <TextBlock Text="Праздники" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🎉" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🔥" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="💯" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="❤️" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="✨" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🏆" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="⭐" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🥇" Click="Emoji_Click"/>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🎉" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f389.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🔥" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f525.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="❤️" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/2764.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="✨" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/2728.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🏆" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f3c6.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="⭐" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/2b50.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🥇" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f947.png" Width="32" Height="32"/>
+                    </Button>
                 </WrapPanel>
 
                 <TextBlock Text="Разное" FontWeight="Bold" Foreground="#333" Margin="2,10,0,5" FontSize="16"/>
                 <WrapPanel>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🧩" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="⏰" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🎯" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="💡" Click="Emoji_Click"/>
-                    <Button Style="{StaticResource EmojiButtonStyle}" Content="🚀" Click="Emoji_Click"/>
+                    
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="⏰" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/23f0.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🎯" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f3af.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="💡" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f4a1.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button Style="{StaticResource EmojiButtonStyle}" Tag="🚀" Click="Emoji_Click">
+                        <Image Source="/Images/Emoji/1f680.png" Width="32" Height="32"/>
+                    </Button>
                 </WrapPanel>
             </StackPanel>
         </ScrollViewer>
@@ -224,7 +281,7 @@
                     Width="40"
                     Margin="0,5,5,0"
                     Click="EmojiButton_Click">
-                <Image Source="/Images/Emoji/bee.png" Width="32" Height="32" Stretch="Uniform"/>
+                <Image Source="/Images/Emoji/acute.png" Width="32" Height="32" Stretch="Uniform"/>
             </Button>
 
             <Button Grid.Column="2"
