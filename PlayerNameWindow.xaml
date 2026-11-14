@@ -1,0 +1,52 @@
+﻿<Window x:Class="NumericCrossword.PlayerNameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Width="350" Height="180">
+
+    <Border CornerRadius="20"
+            Background="#FF1E1E1E"
+            BorderBrush="#55FFFFFF"
+            BorderThickness="2"
+            Padding="20">
+
+        <StackPanel>
+
+            <TextBlock Text="Введите имя"
+                       FontSize="24"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0 0 0 15"/>
+
+            <!-- Поле ввода имени -->
+            <TextBox x:Name="NameBox"
+                     FontSize="20"
+                     Margin="0 0 0 15"
+                     Height="40"/>
+
+            <!-- Кнопки -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="OK"
+                        Width="100" Height="40"
+                        Margin="5"
+                        Click="Ok_Click"
+                        Background="#AA000000"
+                        Foreground="White"
+                        BorderThickness="0"/>
+
+                <Button Content="Отмена"
+                        Width="100" Height="40"
+                        Margin="5"
+                        Click="Cancel_Click"
+                        Background="#AA000000"
+                        Foreground="White"
+                        BorderThickness="0"/>
+            </StackPanel>
+
+        </StackPanel>
+
+    </Border>
+</Window>
