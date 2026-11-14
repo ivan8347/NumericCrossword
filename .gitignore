@@ -1,0 +1,33 @@
+# Папки сборки
+bin/
+obj/
+
+# Файлы Visual Studio
+*.suo
+*.user
+*.sln.docstates
+
+# Пакеты NuGet
+packages/
+
+# Файлы сборки .NET
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider
+.idea/
+
+# macOS и Windows мусор
+.DS_Store
+Thumbs.db
