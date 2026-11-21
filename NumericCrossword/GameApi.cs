@@ -68,9 +68,10 @@ namespace NumericCrossword.Core
         // Единый HttpClient для всех запросов
         private static readonly HttpClient http = new HttpClient
         {
-            BaseAddress = new Uri("https://crosswordserver.onrender.com"),
-            Timeout = TimeSpan.FromSeconds(10) // Увеличил таймаут до 10 сек
+            BaseAddress = new Uri("https://crosswordserver-kit8347.mia0.amvera.tech/"),
+            Timeout = TimeSpan.FromSeconds(10)
         };
+
 
         // Опционально: добавить заголовок User-Agent, чтобы сервер не блокировал запросы
         static GameApi()

@@ -665,8 +665,8 @@ namespace NumericCrossword
         {
             int difficulty = DifficultyBox.SelectedIndex;
 
-            double hideChance = difficulty == 0 ? 0.05 :
-                                difficulty == 1 ? 0.05 : 0.80;
+            double hideChance = difficulty == 0 ? 0.35 :
+                                difficulty == 1 ? 0.55 : 0.80;
 
             foreach (var f in formulas)
             {
@@ -938,7 +938,7 @@ namespace NumericCrossword
 
             MessageBox.Show("Ваш результат отправлен! Ожидайте завершения игры соперником...", "Ожидание");
 
-            int maxAttempts = 150;      // до 5 минут ожидания (150 * 2 сек)
+            int maxAttempts = 500;      // до 5 минут ожидания (150 * 2 сек)
             int delayMs = 2000;
             int attempts = 0;
 
