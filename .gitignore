@@ -1,3 +1,14 @@
+.vs/
+bin/
+obj/
+publish/
+publish_x86/
+Server/
+*.user
+*.suo
+*.wsuo
+*.pfx
+UpgradeLog*
 # Папки сборки
 bin/
 obj/
