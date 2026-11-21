@@ -25,6 +25,7 @@ namespace NumericCrossword
         public bool IsMine { get; set; }
         public bool IsPersonalForMe { get; set; }
         public bool IsPersonalGeneral { get; set; }
+
     }
 
     public partial class ChatWindow : Window
