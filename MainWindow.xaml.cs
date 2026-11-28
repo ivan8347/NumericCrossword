@@ -33,6 +33,7 @@ namespace NumericCrossword
 
         private DispatcherTimer timer;
         private TimeSpan timerValue = TimeSpan.Zero;
+
         private DispatcherTimer networkCheckTimer = new DispatcherTimer();
 
 
@@ -66,7 +67,10 @@ namespace NumericCrossword
             = new Stack<(int, int, string, string, bool)>();
 
 
-        private List<CrosswordTemplate> templatesEasy = new List<CrosswordTemplate>();
+        private List<CrosswordTemplate> templatesEasy = new List<CrosswordTemplate>(); 
+        private List<CrosswordTemplate> templatesMedium = new List<CrosswordTemplate>();
+        private List<CrosswordTemplate> templatesHard = new List<CrosswordTemplate>();
+
 
         private List<Formula> formulas = new List<Formula>();
 
@@ -82,6 +86,8 @@ namespace NumericCrossword
             chatNotifyTimer = new DispatcherTimer();
             chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
             chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
+           
+
         }
 
 
@@ -136,6 +142,7 @@ namespace NumericCrossword
         private async void Cell_Click(object sender, MouseButtonEventArgs e)
         {
             if (!AllowMoves) return;
+            if (e.ClickCount > 1) return;
             Label cell = sender as Label;
 
             // работать только со скрытыми клетками
@@ -154,16 +161,29 @@ namespace NumericCrossword
             }
 
             // переключение выделения
-            if (cell.BorderBrush == Brushes.Red)
+            bool isFilled = !string.IsNullOrEmpty(cell.Content as string);
+
+            if (isFilled)
             {
-                cell.BorderBrush = Brushes.LightGray;
-                cell.BorderThickness = new Thickness(1);
-            }
-            else
-            {
+                // заполненная клетка всегда остаётся выделенной — снять нельзя
                 cell.BorderBrush = Brushes.Red;
                 cell.BorderThickness = new Thickness(3);
             }
+            else
+            {
+                // пустая — обычный тоггл: клик выделяет, повторный снимает
+                if (cell.BorderBrush == Brushes.Red)
+                {
+                    cell.BorderBrush = Brushes.LightGray;
+                    cell.BorderThickness = new Thickness(1);
+                }
+                else
+                {
+                    cell.BorderBrush = Brushes.Red;
+                    cell.BorderThickness = new Thickness(3);
+                }
+            }
+
         }
 
         private async Task InsertValueIntoCell(Label cell, string value)
@@ -303,78 +323,70 @@ namespace NumericCrossword
         // ★ НОВОЕ: общая логика отмены для одной ячейки.
         // Используется и кнопкой «Отмена» (через красное выделение),
         // и двойным щелчком по ячейке.
-        private void UndoCell(int row, int col)
+        private bool  UndoCell(int row, int col)
         {
-            if (cells == null || cells[row, col] == null)
-                return;
+            if (cells == null || cells[row, col] == null) return false;
 
-            // 1. Ищем последнюю запись об этой ячейке в cellUndoStack
+            Label cell = cells[row, col];
+
+            // Берём последнюю запись об этой ячейке из общего стека.
+            // Эту запись возвращать обратно не нужно — она «съедается» отменой,
+            // а более старые записи клетки остаются и позволят отменить ещё раз.
             Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp =
                 new Stack<(int, int, string, string, bool)>();
 
             (int row, int col, string oldValue, string newValue, bool tileWasRemoved) target =
                 (-1, -1, "", "", false);
+            bool found = false;
 
-            while (cellUndoStack.Count > 0)
+            while (undoStack.Count > 0)
             {
-                var move = cellUndoStack.Pop();
+                var move = undoStack.Pop();
 
-                if (move.row == row && move.col == col)
+                if (!found && move.row == row && move.col == col)
                 {
                     target = move;
-                    break;
+                    found = true;
+                    continue;   // запись потреблена отменой — не возвращаем в стек
                 }
                 temp.Push(move);
             }
 
             while (temp.Count > 0)
-                cellUndoStack.Push(temp.Pop());
+                undoStack.Push(temp.Pop());
 
-            // Записей об этой ячейке нет — отменять нечего
-            if (target.row == -1)
-                return;
+            if (!found) return false;   // отменять нечего
 
-            Label cell = cells[row, col];
-
-            // восстановить значение
             cell.Content = target.oldValue;
 
-            // вернуть плитку, если она была удалена
+            // Восстановить баланс плиток
             if (target.tileWasRemoved)
+            {
+                // ход ставил плитку в пустую клетку — возвращаем её в панель
                 ReturnTile(target.newValue);
-
-            // снять выделение
-            cell.BorderBrush = Brushes.LightGray;
-            cell.BorderThickness = new Thickness(1);
-
-            // 2. Очистить ВСЕ записи об этой ячейке из cellUndoStack
-            Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp2 =
-                new Stack<(int, int, string, string, bool)>();
-
-            while (cellUndoStack.Count > 0)
+            }
+            else
             {
-                var m = cellUndoStack.Pop();
-                if (!(m.row == row && m.col == col))
-                    temp2.Push(m);
+                // ход ЗАМЕНЯЛ значение: убираем в панель плитку из клетки,
+                // возвращаем плитку, вытесненную при ходе
+                RemoveTile(target.oldValue);
+                ReturnTile(target.newValue);
             }
 
-            while (temp2.Count > 0)
-                cellUndoStack.Push(temp2.Pop());
-
-            // 3. Очистить ВСЕ записи об этой ячейке из undoStack
-            Stack<(int row, int col, string oldValue, string newValue, bool tileWasRemoved)> temp3 =
-                new Stack<(int, int, string, string, bool)>();
-
-            while (undoStack.Count > 0)
+            if (string.IsNullOrEmpty(cell.Content as string))
             {
-                var m = undoStack.Pop();
-                if (!(m.row == row && m.col == col))
-                    temp3.Push(m);
+                cell.BorderBrush = Brushes.LightGray;
+                cell.BorderThickness = new Thickness(1);
             }
-
-            while (temp3.Count > 0)
-                undoStack.Push(temp3.Pop());
+            else
+            {
+                cell.BorderBrush = Brushes.LightGreen;
+                cell.BorderThickness = new Thickness(5);
+            }
+            return true;
         }
+
+
 
         // ★ НОВОЕ: двойной щелчок по ячейке = отмена действия в ней
         private void Cell_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -387,49 +399,28 @@ namespace NumericCrossword
             UndoCell(Grid.GetRow(cell), Grid.GetColumn(cell));
         }
 
+
         private void BtnUndo_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Ищем выделенную ячейку по красной рамке
-            int selRow = -1;
-            int selCol = -1;
-
+            // 1. Выделенная ячейка — откатываем именно её
             for (int r = 0; r < Rows; r++)
-            {
                 for (int c = 0; c < Cols; c++)
-                {
                     if (cells[r, c].BorderBrush == Brushes.Red)
                     {
-                        selRow = r;
-                        selCol = c;
-                        break;
+                        if (UndoCell(r, c))
+                            return;   // откат по выделению состоялся — на этом всё
+
+                        break;        // в выделенной нечего отменять — идём к общему откату
                     }
-                }
-                if (selRow != -1) break;
-            }
 
-            // 2. Undo по выделенной ячейке
-            if (selRow != -1)
-            {
-                UndoCell(selRow, selCol);
-                return;
-            }
+            // 2. Обычная отмена последнего хода
+            if (undoStack.Count == 0) return;
 
-            // 3. Обычный Undo плиток
-            if (undoStack.Count == 0)
-                return;
-
-            var tileMove = undoStack.Pop();
-
-            Label cell = cells[tileMove.row, tileMove.col];
-
-            cell.Content = tileMove.oldValue;
-
-            if (tileMove.tileWasRemoved)
-                ReturnTile(tileMove.newValue);
-
-            cell.BorderBrush = Brushes.LightGray;
-            cell.BorderThickness = new Thickness(1);
+            var top = undoStack.Peek();
+            UndoCell(top.row, top.col);
         }
+
+
 
         private void ReturnTile(string value)
         {
@@ -480,7 +471,13 @@ namespace NumericCrossword
         //  ГЕНЕРАЦИЯ ОДНОЙ ФОРМУЛЫ
         private Formula GenerateRandomFormula()
         {
-            char[] ops = { '+', '-', '*', '/' };
+            char[] ops;//= { '+', '-', '*', '/' };
+            switch (currentDifficulty)
+            {
+                case "Лёгкий": ops = new[] { '+', '-' }; break;
+                case "Средний": ops = new[] { '+', '-', '*','/' }; break;
+                default: ops = new[] { '+', '-', '*', '/' }; break;
+            }
             char op = ops[rnd.Next(ops.Length)];
 
             int a, b, c;
@@ -661,21 +658,23 @@ namespace NumericCrossword
         // -----------------------------
         //  СКРЫТИЕ ЧИСЕЛ
         // -----------------------------
-        private void ApplyDifficulty(List<Formula> formulas)
+        private void ApplyDifficulty(List<Formula> formulas, string difficulty)
         {
-            int difficulty = DifficultyBox.SelectedIndex;
+            double hideChance;
 
-            double hideChance = difficulty == 0 ? 0.35 :
-                                difficulty == 1 ? 0.55 : 0.80;
+            switch (difficulty)
+            {
+                case "Средний": hideChance = 0.50; break;
+                case "Сложный": hideChance = 0.75; break;
+                default: hideChance = 0.05; break;
+            }
 
             foreach (var f in formulas)
             {
-                // случайно скрываем
                 f.HideA = rnd.NextDouble() < hideChance;
                 f.HideB = rnd.NextDouble() < hideChance;
                 f.HideC = rnd.NextDouble() < hideChance;
 
-                // ❗ запрещаем скрывать ВСЕ три числа
                 if (f.HideA && f.HideB && f.HideC)
                 {
                     int leaveVisible = rnd.Next(3);
@@ -685,6 +684,7 @@ namespace NumericCrossword
                 }
             }
         }
+
 
         // -----------------------------
         //  ОТРИСОВКА ФОРМУЛ
@@ -846,6 +846,7 @@ namespace NumericCrossword
         // -----------------------------
         private void BtnNewGame_Click(object sender, RoutedEventArgs e)
         {
+            DifficultyBox.IsEnabled = true;
             // ⭐ Выходим из сетевого режима
             IsOnlineGame = false;
 
@@ -880,8 +881,18 @@ namespace NumericCrossword
             }
 
             CreateGrid();
+            // ApplyDifficulty(formulas);
+            // в BtnNewGame_Click вместо ApplyDifficulty(formulas, currentDifficulty):
+            string difficulty = DifficultyBox.SelectedItem is ComboBoxItem item
+                ? item.Content.ToString()
+                : currentDifficulty;
+
             formulas = GenerateCrossword();
-            ApplyDifficulty(formulas);
+            ApplyDifficulty(formulas, difficulty);
+
+
+
+
             DrawFormulas(formulas);
             CreateTilesFromFormulas(formulas);
 
@@ -890,7 +901,7 @@ namespace NumericCrossword
 
 
         // ⭐ Финальная версия ShowWinMessage
-        private async void ShowWinMessage()
+        private async void ShowWinMessage(List<GameResult> results = null)
         {
             timer.Stop();
 
@@ -898,6 +909,7 @@ namespace NumericCrossword
             score = totalScore;
             ScoreText.Text = totalScore.ToString();
 
+            // учёт очков и рекордов — один раз, для обоих режимов
             if (CurrentPlayer != null)
             {
                 var newRecord = new LocalScoreRecord(
@@ -909,21 +921,28 @@ namespace NumericCrossword
                 );
 
                 ScoreStorage.AddRecord(newRecord);
+
+                var players = PlayerStorage.Load();
+                var p = players.FirstOrDefault(x => x.Name == CurrentPlayer.Name);
+                if (p != null)
+                    p.TotalScore += totalScore;
+
+                CurrentPlayer.TotalScore = p.TotalScore;
+                BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
+                PlayerStorage.Save(players);
             }
 
-            var players = PlayerStorage.Load();
-            var p = players.FirstOrDefault(x => x.Name == CurrentPlayer.Name);
-            if (p != null)
-                p.TotalScore += totalScore;
+            // сетевая игра: показываем таблицу результатов, локальная — просто сообщение
+            WinMessage msg;
+            if (results != null && results.Count > 0)
+                msg = new WinMessage(results);
+            else
+                msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!\nОчки: " + totalScore);
 
-            CurrentPlayer.TotalScore = p.TotalScore;
-            BtnSelectPlayer.Content = $"{CurrentPlayer.Name} ({CurrentPlayer.TotalScore})";
-            PlayerStorage.Save(players);
-
-            WinMessage msg = new WinMessage("УРА!\nКРОССВОРД РЕШЁН!\nОчки: " + totalScore);
             msg.Owner = this;
             msg.ShowDialog();
         }
+
 
         private async Task FinishOnlineGame()
         {
@@ -938,7 +957,7 @@ namespace NumericCrossword
 
             MessageBox.Show("Ваш результат отправлен! Ожидайте завершения игры соперником...", "Ожидание");
 
-            int maxAttempts = 500;      // до 5 минут ожидания (150 * 2 сек)
+            int maxAttempts = 1000;
             int delayMs = 2000;
             int attempts = 0;
 
@@ -961,51 +980,51 @@ namespace NumericCrossword
             }
 
             // Таймаут: показываем то, что есть
-            MessageBox.Show("Время ожидания истекло. Показываем текущие результаты.", "Таймаут");
             var finalResults = await GameApi.GetResults(currentGameId);
             if (finalResults != null && finalResults.Count > 0)
                 ShowWinMessage(finalResults);
         }
 
 
-        private void ShowWinMessage(List<GameResult> results)
-        {
-            if (results == null || results.Count == 0)
-            {
-                MessageBox.Show("Нет данных для отображения результатов.", "Внимание");
-                return;
-            }
 
-            // 1. Сначала показываем красивое окно со статистикой
-            try
-            {
-                var statsWindow = new NetworkStatsWindow(results);
-                statsWindow.Owner = this;
-                statsWindow.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при открытии NetworkStatsWindow: {ex.Message}", "Ошибка");
-            }
+        //private void ShowWinMessage(List<GameResult> results)
+        //{
+        //    if (results == null || results.Count == 0)
+        //    {
+        //        MessageBox.Show("Нет данных для отображения результатов.", "Внимание");
+        //        return;
+        //    }
 
-            // 2. Формируем текстовый отчет (резерв или лог)
-            string text = "Результаты сетевой игры:\n\n";
-            foreach (var r in results)
-            {
-                text += $"{r.PlayerName}: {r.Score} очков, время {TimeSpan.FromSeconds(r.TimeSeconds):mm\\:ss}\n";
-            }
+        //    // 1. Сначала показываем красивое окно со статистикой
+        //    try
+        //    {
+        //        var statsWindow = new NetworkStatsWindow(results);
+        //        statsWindow.Owner = this;
+        //        statsWindow.ShowDialog();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Ошибка при открытии NetworkStatsWindow: {ex.Message}", "Ошибка");
+        //    }
 
-            try
-            {
-                var msg = new WinMessage(text);
-                msg.Owner = this;
-                msg.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Не удалось открыть WinMessage: " + ex.Message);
-            }
-        }
+        //    // 2. Формируем текстовый отчет (резерв или лог)
+        //    string text = "Результаты сетевой игры:\n\n";
+        //    foreach (var r in results)
+        //    {
+        //        text += $"{r.PlayerName}: {r.Score} очков, время {TimeSpan.FromSeconds(r.TimeSeconds):mm\\:ss}\n";
+        //    }
+
+        //    try
+        //    {
+        //        var msg = new WinMessage(text);
+        //        msg.Owner = this;
+        //        msg.ShowDialog();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine("Не удалось открыть WinMessage: " + ex.Message);
+        //    }
+        //}
 
 
         private bool IsCrosswordSolved()
@@ -1073,10 +1092,12 @@ namespace NumericCrossword
 
         private void DifficultyBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // ⭐ В сетевой игре сложность менять нельзя
-            if (IsOnlineGame)
-                return;
+            if (IsOnlineGame) return;
+
+            if (DifficultyBox.SelectedItem is ComboBoxItem item)
+                currentDifficulty = item.Content.ToString();
         }
+
 
         private void BtnSelectPlayer_Click(object sender, RoutedEventArgs e)
         {
@@ -1155,9 +1176,24 @@ namespace NumericCrossword
             }
         }
 
+        private void PositionChatWindow()
+        {
+            chatWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+
+            // Правый край рабочего стола минус ширина чата, небольшой отступ
+            chatWindow.Left = SystemParameters.WorkArea.Right - chatWindow.Width - 10;
+            chatWindow.Top = SystemParameters.WorkArea.Top + 60;
+        }
+
 
         private void BtnChat_Click(object sender, RoutedEventArgs e)
         {
+            if (CurrentPlayer == null)
+            {
+                MessageBox.Show("Сначала выберите игрока!", "Чат");
+                return;
+            }
+
             hasNewChatMessage = false;
             chatNotifyTimer.Stop();
             blinkState = false;
@@ -1168,45 +1204,34 @@ namespace NumericCrossword
                 chatWindow = new ChatWindow(CurrentPlayer.Name);
                 chatWindow.Owner = this;
 
-                // КЛЮЧЕВАЯ ПРАВКА: закрываем окно = прячем, а не уничтожаем
                 chatWindow.Closing += (s, args) =>
                 {
-                    args.Cancel = true;   // отменяем настоящее закрытие
-                    chatWindow.Hide();    // просто прячем
+                    args.Cancel = true;
+                    chatWindow.Hide();
                 };
 
-                // Подписка на новые сообщения — один раз, при создании окна
                 chatWindow.OnNewMessageReceived += () =>
                 {
+                    if (chatWindow.IsVisible) return;  // чат открыт — мигать не нужно
+
                     hasNewChatMessage = true;
-                    if (!chatNotifyTimer.IsEnabled)
-                        chatNotifyTimer.Start();
+                    StartChatNotification();
                 };
-
-                chatWindow.Show();
-                return;
             }
 
+            PositionChatWindow();
             chatWindow.Show();
-            chatWindow.Focus();
+            chatWindow.WindowState = WindowState.Normal;  // ← разворачиваем из свернутого
+            chatWindow.Activate();
         }
 
-        private void OnChatMessageReceived(string user, string text)
-        {
-            if (chatWindow != null && chatWindow.IsLoaded)
-                chatWindow.AddMessage(user, text);
 
-            if (chatWindow == null || !chatWindow.IsVisible)
-            {
-                hasNewChatMessage = true;
-                StartChatNotification();
-            }
-        }
+
 
         private void StartChatNotification()
         {
             chatNotifyTimer.Interval = TimeSpan.FromMilliseconds(500);
-            chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
+          //  chatNotifyTimer.Tick += ChatNotifyTimer_Tick;
             chatNotifyTimer.Start();
         }
 
@@ -1224,6 +1249,7 @@ namespace NumericCrossword
                 chatNotifyTimer.Stop();
             }
         }
+       
 
 
         // Запуск сетевой игры после выбора или создания
@@ -1288,7 +1314,7 @@ namespace NumericCrossword
                 formulas = GenerateCrossword();
 
                 // ⭐ Применяем сложность сервера
-                ApplyDifficulty(formulas);
+                ApplyDifficulty(formulas, currentDifficulty);
 
                 DrawFormulas(formulas);
                 CreateTilesFromFormulas(formulas);

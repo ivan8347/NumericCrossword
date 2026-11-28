@@ -21,13 +21,6 @@
                     Margin="5"
                     Click="BtnNewGame_Click"/>
 
-            <!--<Button x:Name="BtnPause"
-                     Content="Пауза"
-                     Width="80"
-                     Margin="5"
-                     Click="BtnPause_Click"/>-->
-
-
             <Button x:Name="BtnUndo"
                     Content="Отмена"
                     Width="120" Height="40"
@@ -110,6 +103,7 @@
                            Orientation="Horizontal"
                            Margin="5"/>
             </ScrollViewer>
+
 
         </Grid>
 
